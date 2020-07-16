@@ -353,6 +353,29 @@ class RPC_Session < RPC_Base
     { "result" => "success" }
   end
 
+  #  rpc.call('session.meterpreter_screenshot', 3)
+  def rpc_meterpreter_screenshot(sid, quality=50, savefile=false)
+    s = _valid_session(sid,"meterpreter")
+
+    path    = Rex::Text.rand_text_alpha(8) + ".jpeg"
+    data = s.console.client.ui.screenshot(quality)
+
+    if data
+      if savefile
+        ::File.open(path, 'wb') do |fd|
+          fd.write(data)
+        end
+
+        path = ::File.expand_path(path)
+        { "result" => "success", "path" => path }
+      else
+        b64 = Base64.encode64(data)
+        { "result" => "success", "data" => b64 }
+      end
+    else
+      { "result" => "failure" }
+    end
+  end
 
   # Detaches from a meterpreter session. Serves the same purpose as [CTRL]+[Z].
   #
