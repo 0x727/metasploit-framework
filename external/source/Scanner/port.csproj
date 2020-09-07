@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FB2DAA61-C8BD-472C-8DEE-6A3E9FB9A2A2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>port</RootNamespace>
+    <AssemblyName>port</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="port\main.cs" />
+    <Compile Include="port\scan.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Compatibility\TypeExtensions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Exceptions\Exceptions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="System.Net" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="share\Tools\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

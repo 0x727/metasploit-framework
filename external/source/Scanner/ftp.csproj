@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{27308B50-F632-4492-9DD1-819FCE574579}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>scanner.ftp</RootNamespace>
+    <AssemblyName>ftp</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>scanner.ftp.main</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\DirectoryArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\EnumeratedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FileArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\RegexValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Compatibility\TypeExtensions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Exceptions\Exceptions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentGroupCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentRequiresOtherArgumentsCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\DistinctGroupsCertification.cs" />
+    <Compile Include="share\Exception\IPBreakException.cs" />
+    <Compile Include="share\Exception\IPUserBreakException.cs" />
+    <Compile Include="Model\CrackFTP.cs" />
+    <Compile Include="Model\CrackService.cs" />
+    <Compile Include="share\LumiSoft.Net\AbsoluteUri.cs" />
+    <Compile Include="share\LumiSoft.Net\AsyncOP_State.cs" />
+    <Compile Include="share\LumiSoft.Net\AsyncResultState.cs" />
+    <Compile Include="share\LumiSoft.Net\AuthType.cs" />
+    <Compile Include="share\LumiSoft.Net\BalanceMode.cs" />
+    <Compile Include="share\LumiSoft.Net\BindInfoProtocol.cs" />
+    <Compile Include="share\LumiSoft.Net\BitDebuger.cs" />
+    <Compile Include="share\LumiSoft.Net\ByteBuilder.cs" />
+    <Compile Include="share\LumiSoft.Net\CircleCollection.cs" />
+    <Compile Include="share\LumiSoft.Net\Core.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DnsCache.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DnsCacheEntry.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DnsServerResponse.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\Dns_Client.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DNS_ClientCache.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DNS_ClientException.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DNS_ClientTransaction.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\DNS_ClientTransactionState.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\Client\OPCODE.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_QClass.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_QType.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_Query.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_RCode.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_A.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_AAAA.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_CNAME.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_HINFO.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_MX.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_NAPTR.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_NS.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_PTR.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_SOA.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_SPF.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_SRV.cs" />
+    <Compile Include="share\LumiSoft.Net\DNS\DNS_rr_TXT.cs" />
+    <Compile Include="share\LumiSoft.Net\ErrorEventHandler.cs" />
+    <Compile Include="share\LumiSoft.Net\Error_EventArgs.cs" />
+    <Compile Include="share\LumiSoft.Net\EventArgs.cs" />
+    <Compile Include="share\LumiSoft.Net\ExceptionEventArgs.cs" />
+    <Compile Include="share\LumiSoft.Net\FTP\Client\FTP_Client.cs" />
+    <Compile Include="share\LumiSoft.Net\FTP\Client\FTP_ClientException.cs" />
+    <Compile Include="share\LumiSoft.Net\FTP\Client\TransferType.cs" />
+    <Compile Include="share\LumiSoft.Net\FTP\FTP_ListItem.cs" />
+    <Compile Include="share\LumiSoft.Net\FTP\FTP_TransferMode.cs" />
+    <Compile Include="share\LumiSoft.Net\FTP\FTP_t_ReplyLine.cs" />
+    <Compile Include="share\LumiSoft.Net\HostEndPoint.cs" />
+    <Compile Include="share\LumiSoft.Net\HostEntry.cs" />
+    <Compile Include="share\LumiSoft.Net\IAsyncOP.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\Base64.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\Base64Stream.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\DataSizeExceededException.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\FifoBuffer.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\IncompleteDataException.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\JunkingStream.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\LineSizeExceededException.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\MemoryStreamEx.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\MultiStream.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\PartialStream.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\QuotedPrintableStream.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\ReadWriteControlledStream.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\SizeExceededAction.cs" />
+    <Compile Include="share\LumiSoft.Net\IO\SmartStream.cs" />
+    <Compile Include="share\LumiSoft.Net\IPBindInfo.cs" />
+    <Compile Include="share\LumiSoft.Net\KeyValueCollection.cs" />
+    <Compile Include="share\LumiSoft.Net\Log\LogEntry.cs" />
+    <Compile Include="share\LumiSoft.Net\Log\LogEntryType.cs" />
+    <Compile Include="share\LumiSoft.Net\Log\Logger.cs" />
+    <Compile Include="share\LumiSoft.Net\Log\WriteLogEventArgs.cs" />
+    <Compile Include="share\LumiSoft.Net\MD4Managed.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\AudioFormat.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\AudioIn.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\AudioInDevice.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\AudioOut.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\AudioOutDevice.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\Codec\Audio\AudioCodec.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\Codec\Codec.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\WavePlayer.cs" />
+    <Compile Include="share\LumiSoft.Net\Media\_WaveIn.cs" />
+    <Compile Include="share\LumiSoft.Net\Net_Utils.cs" />
+    <Compile Include="share\LumiSoft.Net\ParseException.cs" />
+    <Compile Include="share\LumiSoft.Net\PortRange.cs" />
+    <Compile Include="share\LumiSoft.Net\Range_long.cs" />
+    <Compile Include="share\LumiSoft.Net\SslMode.cs" />
+    <Compile Include="share\LumiSoft.Net\StreamLineReader.cs" />
+    <Compile Include="share\LumiSoft.Net\StringReader.cs" />
+    <Compile Include="share\LumiSoft.Net\TcpClientSecurity.cs" />
+    <Compile Include="share\LumiSoft.Net\TCP\TCP_Client.cs" />
+    <Compile Include="share\LumiSoft.Net\TCP\TCP_Server.cs" />
+    <Compile Include="share\LumiSoft.Net\TCP\TCP_ServerSession.cs" />
+    <Compile Include="share\LumiSoft.Net\TCP\TCP_ServerSessionEventArgs.cs" />
+    <Compile Include="share\LumiSoft.Net\TCP\TCP_Session.cs" />
+    <Compile Include="share\LumiSoft.Net\TCP\TCP_SessionCollection.cs" />
+    <Compile Include="share\LumiSoft.Net\TextUtils.cs" />
+    <Compile Include="share\LumiSoft.Net\TimerEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="share\LumiSoft.Net\UDP\UDP_DataReceiver.cs" />
+    <Compile Include="share\LumiSoft.Net\UDP\UDP_e_PacketReceived.cs" />
+    <Compile Include="share\LumiSoft.Net\UDP\UDP_Server.cs" />
+    <Compile Include="share\LumiSoft.Net\UriSchemes.cs" />
+    <Compile Include="share\LumiSoft.Net\WellKnownPorts.cs" />
+    <Compile Include="share\LumiSoft.Net\_MD4.cs" />
+    <Compile Include="ftp\main.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Model\ServiceModel.cs" />
+    <Compile Include="share\SmartThreadPool\CallerThreadContext.cs" />
+    <Compile Include="share\SmartThreadPool\CanceledWorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\EventWaitHandleFactory.cs" />
+    <Compile Include="share\SmartThreadPool\Exceptions.cs" />
+    <Compile Include="share\SmartThreadPool\Interfaces.cs" />
+    <Compile Include="share\SmartThreadPool\InternalInterfaces.cs" />
+    <Compile Include="share\SmartThreadPool\PriorityQueue.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
+    <Compile Include="share\SmartThreadPool\STPEventWaitHandle.cs" />
+    <Compile Include="share\SmartThreadPool\STPPerformanceCounter.cs" />
+    <Compile Include="share\SmartThreadPool\STPStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\SynchronizedDictionary.cs" />
+    <Compile Include="share\SmartThreadPool\WIGStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.WorkItemResult.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemFactory.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemResultTWrapper.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroupBase.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsQueue.cs" />
+    <Compile Include="share\Tools\FileTool.cs" />
+    <Compile Include="share\Tools\ParsingTarget.cs" />
+    <Compile Include="share\Tools\ThreadTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="share\CommandLineArgumentsParser\Doc\CommandLineParser.xml" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0ED6860C-B0B3-44F1-B218-2F1EBF39EF0B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>scanner.smb</RootNamespace>
+    <AssemblyName>smb</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>scanner.smb.main</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Model\CrackService.cs" />
+    <Compile Include="Model\CrackSMB.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Model\ServiceModel.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Compatibility\TypeExtensions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Exceptions\Exceptions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+    <Compile Include="share\Exception\IPBreakException.cs" />
+    <Compile Include="share\Exception\IPUserBreakException.cs" />
+    <Compile Include="share\SmartThreadPool\CallerThreadContext.cs" />
+    <Compile Include="share\SmartThreadPool\CanceledWorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\EventWaitHandleFactory.cs" />
+    <Compile Include="share\SmartThreadPool\Exceptions.cs" />
+    <Compile Include="share\SmartThreadPool\Interfaces.cs" />
+    <Compile Include="share\SmartThreadPool\InternalInterfaces.cs" />
+    <Compile Include="share\SmartThreadPool\PriorityQueue.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
+    <Compile Include="share\SmartThreadPool\STPEventWaitHandle.cs" />
+    <Compile Include="share\SmartThreadPool\STPPerformanceCounter.cs" />
+    <Compile Include="share\SmartThreadPool\STPStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\SynchronizedDictionary.cs" />
+    <Compile Include="share\SmartThreadPool\WIGStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.WorkItemResult.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemFactory.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemResultTWrapper.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroupBase.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsQueue.cs" />
+    <Compile Include="share\Tools\FileTool.cs" />
+    <Compile Include="share\Tools\ParsingTarget.cs" />
+    <Compile Include="share\Tools\ThreadTool.cs" />
+    <Compile Include="smb\main.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Config.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\MD5Managed.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\Name.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NameQueryRequest.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NameQueryResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NameServiceClient.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NameServicePacket.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NbtAddress.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NbtException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NodeStatusRequest.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\NodeStatusResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\SessionRequestPacket.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\SessionRetargetResponsePacket.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Netbios\SessionServicePacket.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Ntlmssp\NtlmFlags.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Ntlmssp\NtlmMessage.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Ntlmssp\Type1Message.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Ntlmssp\Type2Message.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Ntlmssp\Type3Message.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\AndXServerMessageBlock.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\BufferCache.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\Dfs.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\DfsReferral.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\DosError.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\IAllocInfo.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\IFileEntry.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\IInfo.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\NtlmAuthenticator.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\NtlmChallenge.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\NtlmContext.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\NtlmPasswordAuthentication.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\NtStatus.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\Principal.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\ServerMessageBlock.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SigningDigest.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbAuthException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComBlankResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComClose.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComCreateDirectory.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComDelete.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComDeleteDirectory.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComFindClose2.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComLogoffAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComNegotiate.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComNegotiateResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComNtCreateAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComNtCreateAndXResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComNtTransaction.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComNtTransactionResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComOpenAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComOpenAndXResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComQueryInformation.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComQueryInformationResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComReadAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComReadAndXResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComRename.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComSessionSetupAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComSessionSetupAndXResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComTransaction.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComTransactionResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComTreeConnectAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComTreeConnectAndXResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComTreeDisconnect.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComWrite.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComWriteAndX.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComWriteAndXResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbComWriteResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbConstants.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbSession.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbTransport.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\SmbTree.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\Trans2FindFirst2.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\Trans2FindFirst2Response.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\Trans2GetDfsReferral.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\Trans2GetDfsReferralResponse.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Smb\WinError.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\UniAddress.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Base64.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\DES.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Encdec.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Hexdump.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Hmact64.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\LogStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Md4.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Rc4.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\AbcdStruct.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\AbstractMap.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Arrays.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\BrokenBarrierException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\BufferedReader.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\BufferedWriter.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\BufferUnderflowException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\CharacterCodingException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\CharBuffer.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\CharSequence.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Collections.2.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Collections.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ConcurrentHashMap.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ConnectException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\DataFormatException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\DateFormat.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\EnumeratorWrapper.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\EofException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Error.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ExecutionException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Extensions.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FileInputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FileOutputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FilePath.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FileReader.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FileWriter.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FilterInputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\FilterOutputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\GitException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Hashtable.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ICallable.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IConcurrentMap.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IExecutor.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IFilenameFilter.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IFuture.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IllegalCharsetNameException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\InputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\InputStreamReader.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\InstantiationException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\InterruptedIoException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IPrivilegedAction.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\IRunnable.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Iterator.2.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ITerator.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\KeyManagementException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\LinkageError.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Matcher.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Md5Core.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\MessageDigest.2.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\MessageDigest.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\MissingResourceException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\NetworkStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\NoSuchAlgorithmException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\NoSuchElementException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\NoSuchMethodException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ObjectInputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ObjectOutputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\OutputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\OutputStreamWriter.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\OverlappingFileLockException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ParseException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\PipedInputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\PipedOutputStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\PrintWriter.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Properties.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\RandomAccessFile.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ReentrantLock.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Reference.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\RunnableAction.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Runtime.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\RuntimeException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\SimpleDateFormat.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\SocketEx.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\StackOverflowError.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\StringCharSequence.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\StringIndexOutOfBoundsException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\StringTokenizer.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\SynchronizedList.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\Thread.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ThreadFactory.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ThreadGroup.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ThreadPoolExecutor.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\UnknownHostException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\UnsupportedCharsetException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\UnsupportedEncodingException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\UriSyntaxException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\UrlConnection.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\VirtualMachineError.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\WrappedSystemStream.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Sharpen\ZipException.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Transport\IRequest.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Transport\Response.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Transport\Transport.cs" />
+    <Compile Include="smb\SharpCifs.shack2.SmbClient\Util\Transport\TransportException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
