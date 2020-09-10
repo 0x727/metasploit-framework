@@ -1,6 +1,7 @@
 # -*- coding: binary -*-
 require 'rex'
 require 'rex/ui/text/output/buffer'
+require 'pry'
 
 module Msf
 module RPC
@@ -640,6 +641,100 @@ class RPC_Session < RPC_Base
     end
     { "modules" => ret }
   end
+
+
+  # akkuman-change
+  # Upload a local file to target session which in loot dir
+  #
+  # @param [Integer] sid Session ID.
+  # @param [String] src local file path
+  # @param [String] dest target session
+  # @return [Hash] A hash indicating the action was successful. It contains the following key:
+  #  * 'result' [String] 'success'
+  # @example Here's how you would use this from the client:
+  #  rpc.call('session.meterpreter_upload_file', 3, '1.txt', '1.txt')
+  def rpc_meterpreter_upload_file(sid, src, dest)
+    s = _valid_session(sid,"meterpreter")
+
+    src = Msf::Config.loot_directory + File::SEPARATOR + src
+    stat = ::File.stat(src)
+    if (stat.directory?)
+      s.fs.dir.upload(dest, src, recursive)
+    elsif (stat.file?)
+      if s.fs.file.exist?(dest) && client.fs.file.stat(dest).directory?
+        s.fs.file.upload(dest, src)
+      else
+        s.fs.file.upload_file(dest, src)
+      end
+    end
+    { :result => 'success' }
+  end
+
+
+  # akkuman-change
+  # list files
+  # reference: Console::CommandDispatcher::Stdapi::Fs#cmd_ls
+  #
+  # @param [Integer] sid Session ID
+  # @param [String] path the target host's dir path
+  # @return [Hash] a hash contains file list. It contains the following key:
+  #   * 'result' [String] 'success'
+  #   * 'data' [List] file list
+  # @example Here's how you would use this from the client
+  #  rpc.call('session.meterpreter_ls', 3, 'C:\\users\XXX\Desktop')
+  def rpc_meterpreter_ls(sid, path=nil)
+    s = _valid_session(sid,"meterpreter")
+
+    path = (path or s.fs.dir.getwd)
+    sort = 'Name'
+    order = :forward
+    short = nil
+    recursive = nil
+    search_term = nil
+    path = s.fs.file.expand_path(path) if path =~ /\%(\w*)\%/
+    stat = s.fs.file.stat(path)
+    dirs = []
+    if (path == "/" and s.platform == "windows")
+      s.fs.mount.show_mount.each do |d|
+        ts = ::Filesize.from("#{d[:total_space]} B").pretty
+        fs = ::Filesize.from("#{d[:free_space]} B").pretty
+        us = ::Filesize.from("#{d[:total_space]-d[:free_space]} B").pretty
+        dir = {
+          :name  => d[:name],
+          :ftype => d[:type],
+          :mode  => "#{fs}/#{ts}",
+          :size  => us,
+        }
+        dirs << dir
+      end
+    elsif stat.directory?
+      s.fs.dir.entries_with_info(path).each do |p|
+        ffstat = p['StatBuf']
+        fname = p['FileName'] || 'unknown'
+        dir = {
+          :mode => ffstat ? ffstat.prettymode : '',
+          :size  => ffstat ? ffstat.size      : '',
+          :ftype => ffstat ? ffstat.ftype     : '',
+          :mtime => ffstat ? ffstat.mtime     : '',
+          :atime => ffstat ? ffstat.atime     : '',
+          :ctime => ffstat ? ffstat.ctime     : '',
+          :name => fname,
+        }
+        dirs << dir
+      end
+    else
+      dir = {
+        :moode => stat ? stat.prettymode : '',
+        :size  => stat ? stat.size       : '',
+        :ftype => stat ? stat.ftype      : '',
+        :mtime => stat ? stat.mtime      : '',
+        :name => fname,
+      }
+      dirs << dir
+    end
+    { 'result' => 'success', 'data' => { 'pwd' => path, 'dirs' => dirs }}
+  end
+
 
 private
 
