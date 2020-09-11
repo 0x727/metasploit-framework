@@ -656,18 +656,22 @@ class RPC_Session < RPC_Base
   def rpc_meterpreter_upload_file(sid, src, dest)
     s = _valid_session(sid,"meterpreter")
 
-    src = Msf::Config.loot_directory + File::SEPARATOR + src
-    stat = ::File.stat(src)
-    if (stat.directory?)
-      s.fs.dir.upload(dest, src, recursive)
-    elsif (stat.file?)
-      if s.fs.file.exist?(dest) && client.fs.file.stat(dest).directory?
-        s.fs.file.upload(dest, src)
-      else
-        s.fs.file.upload_file(dest, src)
+    begin
+      src = Msf::Config.loot_directory + File::SEPARATOR + src
+      stat = ::File.stat(src)
+      if (stat.directory?)
+        s.fs.dir.upload(dest, src, recursive)
+      elsif (stat.file?)
+        if s.fs.file.exist?(dest) && client.fs.file.stat(dest).directory?
+          s.fs.file.upload(dest, src)
+        else
+          s.fs.file.upload_file(dest, src)
+        end
       end
+      { :result => 'success' }
+    rescue ::Exception => e
+      error(500, "#{e.class} #{e}")
     end
-    { :result => 'success' }
   end
 
 
@@ -685,54 +689,58 @@ class RPC_Session < RPC_Base
   def rpc_meterpreter_ls(sid, path=nil)
     s = _valid_session(sid,"meterpreter")
 
-    path = (path or s.fs.dir.getwd)
-    sort = 'Name'
-    order = :forward
-    short = nil
-    recursive = nil
-    search_term = nil
-    path = s.fs.file.expand_path(path) if path =~ /\%(\w*)\%/
-    stat = s.fs.file.stat(path)
-    dirs = []
-    if (path == "/" and s.platform == "windows")
-      s.fs.mount.show_mount.each do |d|
-        ts = ::Filesize.from("#{d[:total_space]} B").pretty
-        fs = ::Filesize.from("#{d[:free_space]} B").pretty
-        us = ::Filesize.from("#{d[:total_space]-d[:free_space]} B").pretty
+    begin
+      path = (path or s.fs.dir.getwd)
+      sort = 'Name'
+      order = :forward
+      short = nil
+      recursive = nil
+      search_term = nil
+      path = s.fs.file.expand_path(path) if path =~ /\%(\w*)\%/
+      stat = s.fs.file.stat(path)
+      dirs = []
+      if (path == "/" and s.platform == "windows")
+        s.fs.mount.show_mount.each do |d|
+          ts = ::Filesize.from("#{d[:total_space]} B").pretty
+          fs = ::Filesize.from("#{d[:free_space]} B").pretty
+          us = ::Filesize.from("#{d[:total_space]-d[:free_space]} B").pretty
+          dir = {
+            :name  => d[:name],
+            :ftype => d[:type],
+            :mode  => "#{fs}/#{ts}",
+            :size  => us,
+          }
+          dirs << dir
+        end
+      elsif stat.directory?
+        s.fs.dir.entries_with_info(path).each do |p|
+          ffstat = p['StatBuf']
+          fname = p['FileName'] || 'unknown'
+          dir = {
+            :mode => ffstat ? ffstat.prettymode : '',
+            :size  => ffstat ? ffstat.size      : '',
+            :ftype => ffstat ? ffstat.ftype     : '',
+            :mtime => ffstat ? ffstat.mtime     : '',
+            :atime => ffstat ? ffstat.atime     : '',
+            :ctime => ffstat ? ffstat.ctime     : '',
+            :name => fname,
+          }
+          dirs << dir
+        end
+      else
         dir = {
-          :name  => d[:name],
-          :ftype => d[:type],
-          :mode  => "#{fs}/#{ts}",
-          :size  => us,
-        }
-        dirs << dir
-      end
-    elsif stat.directory?
-      s.fs.dir.entries_with_info(path).each do |p|
-        ffstat = p['StatBuf']
-        fname = p['FileName'] || 'unknown'
-        dir = {
-          :mode => ffstat ? ffstat.prettymode : '',
-          :size  => ffstat ? ffstat.size      : '',
-          :ftype => ffstat ? ffstat.ftype     : '',
-          :mtime => ffstat ? ffstat.mtime     : '',
-          :atime => ffstat ? ffstat.atime     : '',
-          :ctime => ffstat ? ffstat.ctime     : '',
+          :moode => stat ? stat.prettymode : '',
+          :size  => stat ? stat.size       : '',
+          :ftype => stat ? stat.ftype      : '',
+          :mtime => stat ? stat.mtime      : '',
           :name => fname,
         }
         dirs << dir
       end
-    else
-      dir = {
-        :moode => stat ? stat.prettymode : '',
-        :size  => stat ? stat.size       : '',
-        :ftype => stat ? stat.ftype      : '',
-        :mtime => stat ? stat.mtime      : '',
-        :name => fname,
-      }
-      dirs << dir
+      { 'result' => 'success', 'data' => { 'pwd' => path, 'dirs' => dirs }}
+    rescue ::Exception => e
+      error(500, "list file error: #{e.class} #{e}")
     end
-    { 'result' => 'success', 'data' => { 'pwd' => path, 'dirs' => dirs }}
   end
 
 
