@@ -980,7 +980,7 @@ class Db
 
   def cmd_notes(*args)
     return unless active?
-  ::ActiveRecord::Base.connection_pool.with_connection {
+  ::ApplicationRecord.connection_pool.with_connection {
     mode = :search
     data = nil
     types = nil
@@ -1443,7 +1443,7 @@ class Db
   #
   def cmd_db_import(*args)
     return unless active?
-  ::ActiveRecord::Base.connection_pool.with_connection {
+  ::ApplicationRecord.connection_pool.with_connection {
     if args.include?("-h") || ! (args && args.length > 0)
       cmd_db_import_help
       return
@@ -1500,15 +1500,15 @@ class Db
           print_error("Please note that there were #{warnings} warnings") if warnings > 1
           print_error("Please note that there was one warning") if warnings == 1
 
-        rescue Msf::DBImportError
+        rescue Msf::DBImportError => e
           print_error("Failed to import #{filename}: #{$!}")
-          elog("Failed to import #{filename}: #{$!.class}: #{$!}")
+          elog("Failed to import #{filename}", error: e)
           dlog("Call stack: #{$@.join("\n")}", LEV_3)
           next
         rescue REXML::ParseException => e
           print_error("Failed to import #{filename} due to malformed XML:")
           print_error("#{e.class}: #{e}")
-          elog("Failed to import #{filename}: #{e.class}: #{e}")
+          elog("Failed to import #{filename}", error: e)
           dlog("Call stack: #{$@.join("\n")}", LEV_3)
           next
         end
@@ -1528,7 +1528,7 @@ class Db
   #
   def cmd_db_export(*args)
     return unless active?
-  ::ActiveRecord::Base.connection_pool.with_connection {
+  ::ApplicationRecord.connection_pool.with_connection {
 
     export_formats = %W{xml pwdump}
     format = 'xml'
@@ -1573,7 +1573,7 @@ class Db
   #
   def cmd_db_nmap(*args)
     return unless active?
-  ::ActiveRecord::Base.connection_pool.with_connection {
+  ::ApplicationRecord.connection_pool.with_connection {
     if (args.length == 0)
       print_status("Usage: db_nmap [--save | [--help | -h]] [nmap options]")
       return
@@ -2140,7 +2140,7 @@ class Db
     if framework.db.driver == 'http'
       cdb = framework.db.name
     else
-      ::ActiveRecord::Base.connection_pool.with_connection do |conn|
+      ::ApplicationRecord.connection_pool.with_connection do |conn|
         if conn.respond_to?(:current_database)
           cdb = conn.current_database
         end
@@ -2209,7 +2209,7 @@ class Db
   end
 
   def build_postgres_url
-    conn_params = ActiveRecord::Base.connection_config
+    conn_params = ApplicationRecord.connection_config
     url = ""
     url += "#{conn_params[:username]}" if conn_params[:username]
     url += ":#{conn_params[:password]}" if conn_params[:password]

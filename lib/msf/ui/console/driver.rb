@@ -26,7 +26,7 @@ class Driver < Msf::Ui::Driver
   ConfigGroup = "framework/ui/console"
   DbConfigGroup = "framework/database"
 
-  DefaultPrompt     = "%undmsf5%clr"
+  DefaultPrompt     = "%undmsf#{Metasploit::Framework::Version::MAJOR}%clr"
   DefaultPromptChar = "%clr>"
 
   #
@@ -131,6 +131,12 @@ class Driver < Msf::Ui::Driver
     end
 
     load_db_config(opts['Config'])
+
+    begin
+      FeatureManager.instance.load_config
+    rescue StandardException => e
+      elog(e)
+    end
 
     if !framework.db || !framework.db.active
       if framework.db.error == "disabled"
@@ -285,9 +291,9 @@ class Driver < Msf::Ui::Driver
   end
 
   #
-  # Saves configuration for the console.
+  # Generate configuration for the console.
   #
-  def save_config
+  def get_config
     # Build out the console config group
     group = {}
 
@@ -301,9 +307,23 @@ class Driver < Msf::Ui::Driver
       end
     end
 
-    # Save it
+    group
+  end
+
+  def get_config_core
+    ConfigCore
+  end
+
+  def get_config_group
+    ConfigGroup
+  end
+
+  #
+  # Saves configuration for the console.
+  #
+  def save_config
     begin
-      Msf::Config.save(ConfigGroup => group)
+      Msf::Config.save(ConfigGroup => get_config)
     rescue ::Exception
       print_error("Failed to save console config: #{$!}")
     end

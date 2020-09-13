@@ -8,6 +8,12 @@ class MetasploitModule < Msf::Auxiliary
   include Msf::Auxiliary::Report
   include Msf::Auxiliary::Scanner
 
+  include Msf::Module::Deprecated
+  deprecated(
+    Date.new(2020, 9, 16),
+    reason = "Use exploit/windows/smb/psexec and the 'Command' target with the cmd/windows/generic payload"
+  )
+
   # Aliases for common classes
   SIMPLE = Rex::Proto::SMB::SimpleClient
   XCEPT  = Rex::Proto::SMB::Exceptions
@@ -41,7 +47,7 @@ class MetasploitModule < Msf::Auxiliary
     register_options([
       OptString.new('SMBSHARE', [true, 'The name of a writeable share on the server', 'C$']),
       OptString.new('COMMAND', [true, 'The command you want to execute on the remote host', 'net group "Domain Admins" /domain']),
-      OptString.new('RPORT', [true, 'The Target port', 445]),
+      OptPort.new('RPORT', [true, 'The Target port', 445]),
       OptString.new('WINPATH', [true, 'The name of the remote Windows directory', 'WINDOWS']),
     ])
 
@@ -67,7 +73,7 @@ class MetasploitModule < Msf::Auxiliary
         print_error("Unable to authenticate with given credentials: #{autherror}")
         return
       end
-      output = execute_command_with_output(text, bat, datastore['COMMAND'], @smbshare, @ip, datastore['RETRY'], datastore['DELAY'])
+      output = execute_command_with_output(text, bat, datastore['COMMAND'], @smbshare, @ip, retries: datastore['RETRY'], delay: datastore['DELAY'])
 
       unless output.nil?
         print_good("Command completed successfully!")

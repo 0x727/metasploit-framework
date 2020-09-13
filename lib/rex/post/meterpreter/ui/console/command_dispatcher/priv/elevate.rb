@@ -25,10 +25,10 @@ class Console::CommandDispatcher::Priv::Elevate
 
   ELEVATE_TECHNIQUE_DESCRIPTION =
     [
-      "All techniques available",
-      "Named Pipe Impersonation (In Memory/Admin)",
-      "Named Pipe Impersonation (Dropper/Admin)",
-      "Token Duplication (In Memory/Admin)"
+      'All techniques available',
+      'Named Pipe Impersonation (In Memory/Admin)',
+      'Named Pipe Impersonation (Dropper/Admin)',
+      'Token Duplication (In Memory/Admin)'
     ]
 
   #
@@ -36,7 +36,7 @@ class Console::CommandDispatcher::Priv::Elevate
   #
   def commands
     {
-      "getsystem" => "Attempt to elevate your privilege to that of local system."
+      'getsystem' => 'Attempt to elevate your privilege to that of local system.'
     }
   end
 
@@ -44,7 +44,7 @@ class Console::CommandDispatcher::Priv::Elevate
   # Name for this dispatcher.
   #
   def name
-    "Priv: Elevate"
+    'Priv: Elevate'
   end
 
 
@@ -106,7 +106,7 @@ class Console::CommandDispatcher::Priv::Elevate
       translate_technique_index(technique).each do |desc|
         print_error(desc)
       end
-      elog("#{e.class} #{e.message} (Technique: #{technique})\n#{e.backtrace * "\n"}")
+      elog("Technique: #{technique})", error: e)
       return
     end
 

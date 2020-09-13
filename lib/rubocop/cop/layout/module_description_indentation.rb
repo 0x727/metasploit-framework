@@ -1,7 +1,8 @@
 module RuboCop
   module Cop
     module Layout
-      class ModuleDescriptionIndentation < Cop
+      class ModuleDescriptionIndentation < Base
+        extend AutoCorrector
         include Alignment
 
         MSG = "Module descriptions should be properly aligned to the 'Description' key, and within %q{ ... }"
@@ -22,13 +23,15 @@ module RuboCop
           hash.each_pair do |key, value|
             if key.value == "Description"
               if requires_correction?(key, value)
-                add_offense(value, location: :end)
+                add_offense(value.location.end, &autocorrector(value))
               end
             end
           end
         end
 
-        def autocorrect(description_value)
+        private
+
+        def autocorrector(description_value)
           lambda do |corrector|
             description_key = description_value.parent.key
             new_content = indent_description_value_correctly(description_key, description_value)
@@ -36,8 +39,6 @@ module RuboCop
             corrector.replace(description_value.source_range, new_content)
           end
         end
-
-        private
 
         def requires_correction?(description_key, description_value)
           return false if description_value.single_line?
@@ -51,8 +52,8 @@ module RuboCop
           content_whitespace = indentation(description_key)
           final_line_whitespace = offset(description_key)
 
-          description_content = description_value.source.lines[1...-1]
-          indented_description = description_content.map do |line|
+          description_lines = node_content(description_value).strip.lines
+          indented_description = description_lines.map do |line|
             cleaned_content = line.strip
             if cleaned_content.empty?
               "\n"
@@ -67,6 +68,16 @@ module RuboCop
           new_literal <<= '}'
 
           new_literal
+        end
+
+        def node_content(node)
+          if node.str_type?
+            node.value
+          elsif node.dstr_type?
+            node.children.map(&:value).join
+          else
+            raise "Module description should be a string, instead found '#{node.type}'"
+          end
         end
 
         def hash_arg?(node)
