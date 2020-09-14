@@ -9,6 +9,7 @@ require 'msf/core/web_services/framework_extension'
 require 'msf/core/web_services/servlet_helper'
 require 'msf/core/web_services/servlet/auth_servlet'
 require 'msf/core/web_services/servlet/json_rpc_servlet'
+require 'msf/core/web_services/servlet/web_socket_servlet'
 require 'msf/core/web_services/json_rpc_exception_handling'
 
 module Msf::WebServices
@@ -23,6 +24,7 @@ module Msf::WebServices
     # Servlet registration
     register AuthServlet
     register JsonRpcServlet
+    register WebsocketServlet
 
     # Custom error handling
     register JsonRpcExceptionHandling::SinatraExtension
