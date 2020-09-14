@@ -1,0 +1,2 @@
+exclude:
+- external/source/exploits/bypassuac/source.rb
