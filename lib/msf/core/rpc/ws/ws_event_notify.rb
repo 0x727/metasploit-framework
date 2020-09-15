@@ -17,7 +17,6 @@ module Msf
         end
 
         def on_session_open(session)
-          binding.pry
           res = {
             'sid'         => session.sid,
             'type'        => session.type.to_s,

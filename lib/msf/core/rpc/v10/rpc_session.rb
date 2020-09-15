@@ -1,7 +1,7 @@
 # -*- coding: binary -*-
 require 'rex'
 require 'rex/ui/text/output/buffer'
-require 'pry'
+
 
 module Msf
 module RPC
