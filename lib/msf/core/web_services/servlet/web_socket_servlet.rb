@@ -63,11 +63,30 @@ module Msf::WebServices
           ws = Faye::WebSocket.new(env, nil, { ping: 15 })
           ws.on :open do |_event|
             framework.websocket.register(:console, ws)
-            @console_driver = Msf::Ui::Web::Driver.new(framework: framework)
+            # get console driver form DriverFactory
+            @console_driver = Msf::Ui::Web::DriverFactory.instance.get_or_create(opts={:framework => framework})
+            # @console_driver = Msf::Ui::Web::Driver.new(framework: framework)
             @cid = @console_driver.create_console({})
+            while true do
+              if @console_driver.consoles[@cid].prompt
+                start_msg = {
+                  'cid'     => @cid,
+                  'data'   => @console_driver.read_console(@cid)    || '',
+                  'prompt' => @console_driver.consoles[@cid].prompt || '',
+                  'busy'   => @console_driver.consoles[@cid].busy   || false,
+                }
+                ws.send(start_msg.to_json)
+                break
+              end
+            end
             @console_driver.consoles[@cid].pipe.create_subscriber_proc(
               'ws', &proc { |output|
-                data = { cid: @cid, prompt: @console_driver.consoles[@cid].prompt, output: output }
+                data = {
+                  "cid"    => @cid,
+                  "data"   => output,
+                  "prompt" => @console_driver.consoles[@cid].prompt || '',
+                  "busy"   => @console_driver.consoles[@cid].busy   || false,
+                }
                 ws.send(data.to_json)
               }
             )

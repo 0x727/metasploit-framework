@@ -160,6 +160,29 @@ protected
 
 end
 
+
+# Add DriverFactory, makes it possible to get the same Driver instance
+class DriverFactory
+  include Singleton
+
+  def initialize()
+    @drivers = Hash.new
+    @mutex = Mutex.new
+  end
+
+  def get_or_create(opts={}, name='default')
+    if not @drivers.key?(name)
+      @mutex.synchronize {
+        if not @drivers.key?(name)
+          @drivers[name] = Driver.new(opts)
+          return @drivers[name]
+        end
+      }
+    end
+    return @drivers[name]
+  end
+end
+
 end
 end
 end

@@ -18,11 +18,22 @@ module Msf
 
         def on_session_open(session)
           res = {
-            'sid'         => session.sid,
-            'type'        => session.type.to_s,
-            'tunnel_to_s' => session.tunnel_to_s,
-            'via_exploit' => session.via_exploit.to_s,
-            'via_payload' => session.via_payload.to_s
+            'type'         => session.type.to_s,
+            'tunnel_local' => session.tunnel_local.to_s,
+            'tunnel_peer'  => session.tunnel_peer.to_s,
+            'via_exploit'  => session.via_exploit.to_s,
+            'via_payload'  => session.via_payload.to_s,
+            'desc'         => session.desc.to_s,
+            'info'         => session.info.to_s,
+            'workspace'    => session.workspace.to_s,
+            'session_host' => session.session_host.to_s,
+            'session_port' => session.session_port.to_i,
+            'target_host'  => session.target_host.to_s,
+            'username'     => session.username.to_s,
+            'uuid'         => session.uuid.to_s,
+            'exploit_uuid' => session.exploit_uuid.to_s,
+            'routes'       => session.routes.join(","),
+            'arch'         => session.arch.to_s
           }
           if (session.type.to_s == 'meterpreter')
             res['platform'] = session.platform.to_s

@@ -12,7 +12,8 @@ class RPC_Console < RPC_Base
   # @return [Msf::Ui::Web::Driver]
   def initialize(*args)
     super
-    @console_driver = Msf::Ui::Web::Driver.new(:framework => framework)
+    # get console driver form DriverFactory
+    @console_driver = Msf::Ui::Web::DriverFactory.instance.get_or_create(opts={:framework => framework})
   end
 
   # Creates a new framework console instance.
