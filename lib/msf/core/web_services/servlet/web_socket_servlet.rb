@@ -63,21 +63,37 @@ module Msf::WebServices
           ws = Faye::WebSocket.new(env, nil, { ping: 15 })
           ws.on :open do |_event|
             framework.websocket.register(:console, ws)
-            # get console driver form DriverFactory
             @console_driver = Msf::Ui::Web::DriverFactory.instance.get_or_create(opts={:framework => framework})
-            # @console_driver = Msf::Ui::Web::Driver.new(framework: framework)
             @cid = @console_driver.create_console({})
             prompt = @console_driver.consoles[@cid].console.update_prompt
             start_msg = {
-              'cid'     => @cid,
-              'data'   => @console_driver.consoles[@cid].read   || '',
+              'cid'    => @cid,
+              'data'   => Rex::Text.encode_base64(@console_driver.consoles[@cid].read)   || '',
               'prompt' => @console_driver.consoles[@cid].prompt || '',
             }
             ws.send(start_msg.to_json)
+            @sub_id = "ws_#{@cid}"
+            @console_driver.consoles[@cid].pipe.create_subscriber_proc(
+              @sub_id, &proc { |output|
+                prompt = @console_driver.consoles[@cid].console.update_prompt
+                if (@console_driver.consoles[@cid].console.active_session)
+                  prompt = @console_driver.consoles[@cid].console.update_prompt('%undmeterpreter%clr')
+                end
+                data = {
+                  'cid'    => @cid,
+                  'prompt' => prompt || '',
+                  'data'   => Rex::Text.encode_base64(output) || ''
+                }
+                ws.send(data.to_json)
+              }
+            )
           end
 
           ws.on :close do |_event|
             framework.websocket.deregister(:console, ws)
+            if @console_driver.consoles[@cid].pipe.has_subscriber?(@sub_id)
+              @console_driver.consoles[@cid].pipe.remove_subscriber(@sub_id)
+            end
             @console_driver.consoles[@cid].shutdown
             @console_driver.consoles.delete(@cid)
             ws = nil
@@ -85,18 +101,7 @@ module Msf::WebServices
 
           ws.on :message do |event|
             input = event.data
-            framework.threads.spawn("WebsocketConsoleRunSingle", false, @console_driver.consoles[@cid]) { |cons|
-              cons.update_access
-              cons.execute(input.lstrip.rstrip)
-              output = cons.read
-              prompt = cons.console.update_prompt
-              data = {
-                "cid"    => @cid,
-                "data"   => output    || '',
-                "prompt" => prompt    || '',
-              }
-              ws.send(data.to_json)
-            }
+            @console_driver.consoles[@cid].pipe.write_input(input)
           end
           ws.rack_response
         else

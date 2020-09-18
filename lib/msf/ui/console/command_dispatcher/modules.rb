@@ -966,6 +966,7 @@ module Msf
 
                 self.active_module = nil
               end
+              print
 
               # Destack the current dispatcher
               driver.destack_dispatcher

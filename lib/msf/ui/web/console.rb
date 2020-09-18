@@ -131,9 +131,11 @@ class WebConsole
       self.console.active_session.completed = true
       self.console.active_session.detach()
     end
+    self.pipe.print
   end
 
   def session_kill
+    self.pipe.print
     self.thread.raise(Interrupt)
   end
 
