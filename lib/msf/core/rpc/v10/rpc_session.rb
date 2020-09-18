@@ -280,6 +280,62 @@ class RPC_Session < RPC_Base
     { "result" => "success" }
   end
 
+  def rpc_meterpreter_cmdexec(sid, cmd, args=nil, time_out=15)
+    s = _valid_session(sid, nil)
+    framework.events.on_session_command(s, "#{cmd} #{args}")
+    self.framework.threads.spawn("MeterpreterCmdExec", false, s, cmd, args, time_out) { |sess, cmd, args, time_out|
+      case sess.type
+      when /meterpreter/
+        start = Time.now.to_i
+        if args.nil? and cmd =~ /[^a-zA-Z0-9\/._-]/
+          args = ""
+        end
+
+        sess.response_timeout = time_out
+        process = sess.sys.process.execute(cmd, args, {'Hidden' => true, 'Channelized' => true, 'Subshell' => true })
+        o = ""
+        # Wait up to time_out seconds for the first bytes to arrive
+        while (d = process.channel.read)
+          o << d
+          if d == ""
+            if Time.now.to_i - start < time_out
+              sleep 0.1
+            else
+              break
+            end
+          end
+        end
+        o.chomp! if o
+
+        begin
+          process.channel.close
+        rescue IOError => e
+          # Channel was already closed, but we got the cmd output, so let's soldier on.
+        end
+
+        process.close
+      when /powershell/
+        if args.nil? || args.empty?
+          o = sess.shell_command("#{cmd}", time_out)
+        else
+          o = sess.shell_command("#{cmd} #{args}", time_out)
+        end
+        o.chomp! if o
+      when /shell/
+        if args.nil? || args.empty?
+          o = sess.shell_command_token("#{cmd}", time_out)
+        else
+          o = sess.shell_command_token("#{cmd} #{args}", time_out)
+        end
+        o.chomp! if o
+      end
+      if not o.nil?
+        framework.events.on_session_output(sess, o)
+      end
+    }
+    { "result" => "success" }
+  end
+
 
   # akkuman-change
   # Block execution command
