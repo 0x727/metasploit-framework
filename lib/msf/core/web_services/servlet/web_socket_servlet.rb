@@ -65,6 +65,7 @@ module Msf::WebServices
             framework.websocket.register(:console, ws)
             @console_driver = Msf::Ui::Web::DriverFactory.instance.get_or_create(opts={:framework => framework})
             @cid = @console_driver.create_console({})
+            # send welcome message
             prompt = @console_driver.consoles[@cid].console.update_prompt
             start_msg = {
               'cid'    => @cid,
@@ -72,6 +73,7 @@ module Msf::WebServices
               'prompt' => @console_driver.consoles[@cid].prompt || '',
             }
             ws.send(start_msg.to_json)
+            # create separated subscriber
             @sub_id = "ws_#{@cid}"
             @console_driver.consoles[@cid].pipe.create_subscriber_proc(
               @sub_id, &proc { |output|
