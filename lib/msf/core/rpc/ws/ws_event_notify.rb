@@ -58,6 +58,16 @@ module Msf
           framework.websocket.notify(:notify, data)
         end
 
+        def on_session_output(session, output)
+          output = Rex::Text.encode_base64(output)
+          res = {
+            'sid'  => session.sid,
+            'data' => output
+          }
+          data = framework.websocket.wrap_websocket_data(:notify, __method__, res)
+          framework.websocket.notify(:notify, data)
+        end
+
         def method_missing(_method_name, *_args)
         end
 
