@@ -745,6 +745,8 @@ module Msf
             end
 
             mod.init_ui(driver.input, driver.output)
+            # trigger driver console subscriber handler
+            print
           end
 
           #

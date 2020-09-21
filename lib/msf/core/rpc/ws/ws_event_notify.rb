@@ -62,7 +62,7 @@ module Msf
           output = Rex::Text.encode_base64(output)
           res = {
             'sid'  => session.sid,
-            'data' => output
+            'output' => output
           }
           data = framework.websocket.wrap_websocket_data(:notify, __method__, res)
           framework.websocket.notify(:notify, data)

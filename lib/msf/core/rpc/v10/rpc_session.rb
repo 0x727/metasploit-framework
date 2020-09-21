@@ -459,15 +459,6 @@ class RPC_Session < RPC_Base
     { "result" => "success", "data" => b64 }
   end
 
-    #  rpc.call('session.meterpreter_keyscan_dump', 3)
-  def rpc_meterpreter_keyscan_dump(sid)
-    s = _valid_session(sid,"meterpreter")
-
-    data = s.console.client.ui.keyscan_dump
-    b64 = Base64.encode64(data)
-    { "result" => "success", "data" => b64 }
-  end
-
   #  rpc.call('session.meterpreter_route', 3)
   def rpc_meterpreter_route(sid)
     s = _valid_session(sid,"meterpreter")
