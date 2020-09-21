@@ -2,10 +2,17 @@
 
 require 'json'
 require 'msf/util/document_generator'
+require 'pry'
 
 module Msf
 module RPC
 class RPC_Module < RPC_Base
+
+  class ModuleExecutePipe < Rex::Ui::Text::BidirectionalPipe
+    def prompting?
+      false
+    end
+  end
 
   # Returns a list of all module info
   #
@@ -491,6 +498,23 @@ class RPC_Module < RPC_Base
   #  rpc.call('module.execute', 'exploit', 'multi/handler', opts)
   def rpc_execute(mtype, mname, opts)
     mod = _find_module(mtype,mname)
+    if mtype == 'post'
+      binding.pry
+      pipe = ModuleExecutePipe.new
+      pipe.create_subscriber_proc(
+        mod.uuid, &proc { |output|
+          binding.pry
+          framework.db.report_module_result(opts={
+            :track_uuid => mod.uuid,
+            :fullname   => mod.fullname,
+            :output     => output,
+          })
+        }
+      )
+
+      opts['LocalOutput'] = pipe
+    end
+    
 
     case mtype
       when 'exploit'
@@ -787,7 +811,8 @@ private
   def _run_post(mod, opts)
     Msf::Simple::Post.run_simple(mod, {
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput']
     })
     {
       "job_id" => mod.job_id,
