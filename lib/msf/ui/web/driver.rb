@@ -43,6 +43,8 @@ class Driver < Msf::Ui::Driver
     self.consoles = {}
     self.sessions = {}
 
+    @mutex = Mutex.new
+
     if(opts[:framework])
       self.framework = opts[:framework]
     else
@@ -64,8 +66,11 @@ class Driver < Msf::Ui::Driver
     # Destroy any unused consoles
     clean_consoles
 
-    console = WebConsole.new(self.framework, self.last_console, opts)
-    self.last_console += 1
+    console = nil
+    @mutex.synchronize {
+      console = WebConsole.new(self.framework, self.last_console, opts)
+      self.last_console += 1
+    }
     self.consoles[console.console_id.to_s] = console
     console.console_id.to_s
   end
