@@ -72,11 +72,18 @@ module Msf
         end
 
       end
+
       def initialize(framework, _opts)
         @subscriber = Subscriber.new(framework)
-        subscribers = framework.events.instance_variable_get(:@session_event_subscribers).collect(&:class)
-        if !subscribers.include?(@subscriber.class)
+        event_subscribers = framework.events.instance_variable_get(:@session_event_subscribers).collect(&:class)
+        general_subscribers = framework.events.instance_variable_get(:@general_event_subscribers).collect(&:class)
+        # add self to session subscriber for listen the on_session_*
+        if !event_subscribers.include?(@subscriber.class)
           framework.events.add_session_subscriber(@subscriber)
+        end
+        # add self to general subscriber for listen the on_module_*
+        if !general_subscribers.include?(@subscriber.class)
+          framework.events.add_general_subscriber(@subscriber)
         end
       end
     end
