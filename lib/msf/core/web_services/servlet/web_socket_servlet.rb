@@ -93,17 +93,14 @@ module Msf::WebServices
 
           ws.on :close do |_event|
             framework.websocket.deregister(:console, ws)
-            if @console_driver.consoles[@cid].pipe.has_subscriber?(@sub_id)
-              @console_driver.consoles[@cid].pipe.remove_subscriber(@sub_id)
-            end
-            @console_driver.consoles[@cid].shutdown
-            @console_driver.consoles.delete(@cid)
+            @console_driver.destroy_console(@cid)
+            dlog("destroy_console #{@cid}")
             ws = nil
           end
 
           ws.on :message do |event|
             input = event.data
-            @console_driver.consoles[@cid].pipe.write_input(input)
+            @console_driver.write_console(@cid, input)
           end
           ws.rack_response
         else
