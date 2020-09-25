@@ -401,6 +401,15 @@ ActiveRecord::Schema.define(version: 2019_05_07_120211) do
     t.index ["name"], name: "index_module_refs_on_name"
   end
 
+  create_table "module_results", id: :serial, force: :cascade do |t|
+    t.integer "session_id"
+    t.string "track_uuid"
+    t.text "fullname"
+    t.binary "output"
+    t.datetime "created_at", precision: 6
+    t.index ["track_uuid"], name: "index_module_results_on_track_uuid"
+  end
+
   create_table "module_runs", id: :serial, force: :cascade do |t|
     t.datetime "attempted_at"
     t.text "fail_detail"

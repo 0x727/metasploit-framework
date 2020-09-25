@@ -5,7 +5,6 @@
 #
 
 require 'monitor'
-require 'pry'
 
 #
 # Project
@@ -498,7 +497,6 @@ class FrameworkEventSubscriber
     end
     chunks.each { |chunk|
       session_event('session_output', session, :output => chunk)
-      binding.pry
       framework.db.report_session_event({
         :etype => 'output',
         :session => session,

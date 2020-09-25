@@ -85,6 +85,19 @@ PATH
       xdr
       xmlrpc
 
+PATH
+  remote: /home/lab/working/homados-working/metasploit_data_models
+  specs:
+    metasploit_data_models (4.0.3)
+      activerecord (~> 5.2.2)
+      activesupport (~> 5.2.2)
+      arel-helpers
+      metasploit-concern
+      metasploit-model
+      pg
+      railties (~> 5.2.2)
+      recog (~> 2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -220,15 +233,6 @@ GEM
       activesupport (~> 5.2.2)
       railties (~> 5.2.2)
     metasploit-payloads (2.0.12)
-    metasploit_data_models (4.0.2)
-      activerecord (~> 5.2.2)
-      activesupport (~> 5.2.2)
-      arel-helpers
-      metasploit-concern
-      metasploit-model
-      pg
-      railties (~> 5.2.2)
-      recog (~> 2.0)
     metasploit_payloads-mettle (1.0.2)
     method_source (1.0.0)
     mini_portile2 (2.4.0)
@@ -448,6 +452,7 @@ DEPENDENCIES
   fivemat
   memory_profiler
   metasploit-framework!
+  metasploit_data_models!
   octokit
   pry-byebug
   rake

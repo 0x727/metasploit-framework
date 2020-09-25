@@ -2,7 +2,6 @@
 
 require 'json'
 require 'msf/util/document_generator'
-require 'pry'
 
 module Msf
 module RPC
@@ -498,13 +497,20 @@ class RPC_Module < RPC_Base
   #  rpc.call('module.execute', 'exploit', 'multi/handler', opts)
   def rpc_execute(mtype, mname, opts)
     mod = _find_module(mtype,mname)
+
+    s = nil
+    if opts
+      sid = opts['SESSION'] || opts['session']
+      if sid
+        s = self.framework.sessions[sid.to_i]
+      end
+    end
     if mtype == 'post'
-      binding.pry
       pipe = ModuleExecutePipe.new
       pipe.create_subscriber_proc(
         mod.uuid, &proc { |output|
-          binding.pry
           framework.db.report_module_result(opts={
+            :session    => s,
             :track_uuid => mod.uuid,
             :fullname   => mod.fullname,
             :output     => output,

@@ -64,8 +64,8 @@ module Msf::DBManager::ModuleResult
     session = nil
 
   ::ApplicationRecord.connection_pool.with_connection {
-    if (opts.respond_to? :session and opts[:session].respond_to? :db_record)
-      session = ops[:session].db_record
+    if (opts[:session].respond_to? :db_record)
+      session = opts[:session].db_record
     end
     result_data = { :created_at => Time.now }
     session_id = nil
