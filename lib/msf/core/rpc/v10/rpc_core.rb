@@ -1,4 +1,6 @@
 # -*- coding: binary -*-
+require 'fileutils'
+
 module Msf
 module RPC
 class RPC_Core < RPC_Base
@@ -184,19 +186,33 @@ class RPC_Core < RPC_Base
   # List file for loot_directory
   #
   # @example Here's how you would use this from the client:
-  # rpc.call('core.loot_list')
-  def rpc_loot_list
-    fileList = []
-    Dir.foreach(Msf::Config.loot_directory) do |file|
-
-      filepath = File.join(Msf::Config.loot_directory, file)
-      if file != "." and file != ".." and File.file?(filepath)
+  # rpc.call('core.loot_list', 'screenshot')
+  def rpc_loot_list(path='')
+    path = path.strip.delete_prefix('/').delete_prefix('../')
+    dirs = []
+    basedir = File.join(Msf::Config.loot_directory, path)
+    Dir.foreach(basedir) do |file|
+      filepath = File.join(basedir, file)
+      if file != "." and file != ".."
         filesize = File.size(filepath)
         mtime    = File.mtime(filepath).to_i
-        fileList = fileList.push({:name => file, :size => filesize, :mtime => mtime})
+        atime    = File.atime(filepath).to_i
+        ctime    = File.ctime(filepath).to_i
+        is_dir   = File.directory?(filepath)
+        filetype = File.ftype(filepath)
+        dirs << {
+          :name   => file,
+          :mode   => '',
+          :ftype  => filetype,
+          :size   => filesize,
+          :mtime  => mtime,
+          :atime  => mtime,
+          :ctime  => ctime,
+          :is_dir => is_dir,
+        }
       end
     end
-    fileList
+    { 'pwd' => path, 'dirs' => dirs }
   end
 
   # akkuman-change
@@ -209,19 +225,16 @@ class RPC_Core < RPC_Base
   #
   # @example Here's how you would use this from the client:
   # rpc.call('core.loot_upload', '1.txt', 'aGVsbG93b3JsZA==')
-  def rpc_loot_upload(filename, data)
+  def rpc_loot_upload(path, data)
+    path = path.strip.delete_prefix('/').delete_prefix('../')
+    basedir = File.join(Msf::Config.loot_directory, File.dirname(path))
+    FileUtils.mkdir_p(basedir)
+    local_path = File.join(basedir, File.basename(path))
 
-    begin
-      filename   = filename.delete('/\\')
-      local_path = File.join(Msf::Config.loot_directory, filename)
-
-      binary_data = Base64.decode64(data)
-      hostsfile   = File.open(local_path, 'wb')
-      hostsfile.write(binary_data)
-      hostsfile.close()
-    rescue ::Exception
-      {:result => false}
-    end
+    binary_data = Base64.decode64(data)
+    hostsfile   = File.open(local_path, 'wb')
+    hostsfile.write(binary_data)
+    hostsfile.close()
     {:result => true}
   end
 
@@ -235,9 +248,9 @@ class RPC_Core < RPC_Base
   #
   # @example Here's how you would use this from the client:
   # rpc.call('core.loot_download', '1.txt')
-  def rpc_loot_download(filename)
-    filename   = filename.delete('/\\')
-    local_path = File.join(Msf::Config.loot_directory, filename)
+  def rpc_loot_download(path)
+    path = path.strip.delete_prefix('/').delete_prefix('../')
+    local_path = File.join(Msf::Config.loot_directory, path)
     if File.file?(local_path)
       binary_data = File.read(local_path, mode: "rb")
       base64_data = Base64.strict_encode64(binary_data)
@@ -257,15 +270,11 @@ class RPC_Core < RPC_Base
   #
   # @example Here's how you would use this from the client:
   # rpc.call('core.loot_destroy', '1.txt')
-  def rpc_loot_destroy(filename)
-    filename   = filename.delete('/\\')
-    local_path = File.join(Msf::Config.loot_directory, filename)
-    if File.file?(local_path)
-      File.delete(local_path)
-      {:result => true}
-    else
-      {:result => false}
-    end
+  def rpc_loot_destroy(path)
+    path = path.strip.delete_prefix('/').delete_prefix('../')
+    local_path = File.join(Msf::Config.loot_directory, path)
+    FileUtils.rm_rf(local_path)
+    {:result => true}
   end
 
 end
