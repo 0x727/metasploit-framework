@@ -1,7 +1,7 @@
 # -*- coding: binary -*-
 require 'rex'
 require 'rex/ui/text/output/buffer'
-
+require 'fileutils'
 
 module Msf
 module RPC
@@ -411,24 +411,21 @@ class RPC_Session < RPC_Base
   end
 
   #  rpc.call('session.meterpreter_screenshot', 3)
-  def rpc_meterpreter_screenshot(sid, quality=50, savefile=false)
+  def rpc_meterpreter_screenshot(sid, quality=50)
     s = _valid_session(sid,"meterpreter")
 
-    path    = Rex::Text.rand_text_alpha(8) + ".jpeg"
-    data = s.console.client.ui.screenshot(quality)
+    screenshot_path =  "screenshots/#{s.session_host}_#{Time.now.strftime('%Y%m%d%H%M%S')}.jpeg"
+    basedir = File.join(Msf::Config.loot_directory, File.dirname(screenshot_path))
+    FileUtils.mkdir_p(basedir)
+    data     = s.console.client.ui.screenshot(quality)
 
     if data
-      if savefile
-        ::File.open(path, 'wb') do |fd|
-          fd.write(data)
-        end
-
-        path = ::File.expand_path(path)
-        { "result" => "success", "path" => path }
-      else
-        b64 = Base64.encode64(data)
-        { "result" => "success", "data" => b64 }
+      path = File.join(basedir, File.basename(screenshot_path))
+      ::File.open(path, 'wb') do |fd|
+        fd.write(data)
       end
+      b64 = Base64.strict_encode64(data)
+      { "result" => "success", "data" => b64, "path" => screenshot_path }
     else
       { "result" => "failure" }
     end
@@ -764,12 +761,12 @@ class RPC_Session < RPC_Base
           ffstat = p['StatBuf']
           fname = p['FileName'] || 'unknown'
           dir = {
-            :mode => ffstat ? ffstat.prettymode : '',
-            :size  => ffstat ? ffstat.size      : '',
-            :ftype => ffstat ? ffstat.ftype     : '',
-            :mtime => ffstat ? ffstat.mtime     : '',
-            :atime => ffstat ? ffstat.atime     : '',
-            :ctime => ffstat ? ffstat.ctime     : '',
+            :mode  => ffstat ? ffstat.prettymode : '',
+            :size  => ffstat ? ffstat.size       : '',
+            :ftype => ffstat ? ffstat.ftype      : '',
+            :mtime => ffstat ? ffstat.mtime      : '',
+            :atime => ffstat ? ffstat.atime      : '',
+            :ctime => ffstat ? ffstat.ctime      : '',
             :name => fname,
           }
           dirs << dir
