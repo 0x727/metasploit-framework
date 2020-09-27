@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A1AFB841-A0D4-4D3C-8244-382072DCAD78}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>mysql</RootNamespace>
+    <AssemblyName>mysql</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Model\CrackMySQL.cs" />
+    <Compile Include="Model\CrackService.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Model\ServiceModel.cs" />
+    <Compile Include="mysql\main.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\DirectoryArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\EnumeratedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FileArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\RegexValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Compatibility\TypeExtensions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Exceptions\Exceptions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentGroupCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentRequiresOtherArgumentsCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\DistinctGroupsCertification.cs" />
+    <Compile Include="share\Exception\IPBreakException.cs" />
+    <Compile Include="share\Exception\IPUserBreakException.cs" />
+    <Compile Include="share\MySql.Data\Authentication\AuthenticationManager.cs" />
+    <Compile Include="share\MySql.Data\Authentication\MySQLAuthenticationPlugin.cs" />
+    <Compile Include="share\MySql.Data\Authentication\NativePasswordPlugins.cs" />
+    <Compile Include="share\MySql.Data\Authentication\Sha256AuthenticationPlugin.cs" />
+    <Compile Include="share\MySql.Data\Authentication\WindowsAuthenticationPlugin.cs" />
+    <Compile Include="share\MySql.Data\BulkLoader.cs" />
+    <Compile Include="share\MySql.Data\CharSetMap.cs" />
+    <Compile Include="share\MySql.Data\command.cs" />
+    <Compile Include="share\MySql.Data\CommandBuilder.cs" />
+    <Compile Include="share\MySql.Data\common\Cache.cs" />
+    <Compile Include="share\MySql.Data\common\ContextString.cs" />
+    <Compile Include="share\MySql.Data\common\LowResolutionStopwatch.cs" />
+    <Compile Include="share\MySql.Data\common\MyNetworkStream.cs" />
+    <Compile Include="share\MySql.Data\common\MySqlTokenizer.cs" />
+    <Compile Include="share\MySql.Data\common\NamedPipeStream.cs" />
+    <Compile Include="share\MySql.Data\common\NativeMethods.cs" />
+    <Compile Include="share\MySql.Data\common\Platform.cs" />
+    <Compile Include="share\MySql.Data\common\QueryNormalizer.cs" />
+    <Compile Include="share\MySql.Data\common\SHA1.cs" />
+    <Compile Include="share\MySql.Data\common\SharedMemoryStream.cs" />
+    <Compile Include="share\MySql.Data\common\SocketStream.cs" />
+    <Compile Include="share\MySql.Data\common\StreamCreator.cs" />
+    <Compile Include="share\MySql.Data\common\Version.cs" />
+    <Compile Include="share\MySql.Data\CompressedStream.cs" />
+    <Compile Include="share\MySql.Data\Connection.cs" />
+    <Compile Include="share\MySql.Data\Crypt.cs" />
+    <Compile Include="share\MySql.Data\dataadapter.cs" />
+    <Compile Include="share\MySql.Data\datareader.cs" />
+    <Compile Include="share\MySql.Data\Driver.cs" />
+    <Compile Include="share\MySql.Data\Exception.cs" />
+    <Compile Include="share\MySql.Data\Field.cs" />
+    <Compile Include="share\MySql.Data\Installer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="share\MySql.Data\Interceptors\CommandInterceptor.cs" />
+    <Compile Include="share\MySql.Data\Interceptors\ExceptionInterceptor.cs" />
+    <Compile Include="share\MySql.Data\Interceptors\Interceptor.cs" />
+    <Compile Include="share\MySql.Data\ISSchemaProvider.cs" />
+    <Compile Include="share\MySql.Data\MySqlClientFactory.cs" />
+    <Compile Include="share\MySql.Data\MySqlClientPermission.cs" />
+    <Compile Include="share\MySql.Data\MySqlClientPermissionAttribute.cs" />
+    <Compile Include="share\MySql.Data\MySqlConfiguration.cs" />
+    <Compile Include="share\MySql.Data\MySqlConnectionStringBuilder.cs" />
+    <Compile Include="share\MySql.Data\MysqlDefs.cs" />
+    <Compile Include="share\MySql.Data\MySqlError.cs" />
+    <Compile Include="share\MySql.Data\MySqlHelper.cs" />
+    <Compile Include="share\MySql.Data\MySqlPacket.cs" />
+    <Compile Include="share\MySql.Data\MySqlPool.cs" />
+    <Compile Include="share\MySql.Data\MySqlPoolManager.cs" />
+    <Compile Include="share\MySql.Data\MySqlPromotableTransaction.cs" />
+    <Compile Include="share\MySql.Data\MySqlScript.cs" />
+    <Compile Include="share\MySql.Data\MySqlSecurityPermission.cs" />
+    <Compile Include="share\MySql.Data\MySqlStream.cs" />
+    <Compile Include="share\MySql.Data\MySqlTrace.cs" />
+    <Compile Include="share\MySql.Data\NativeDriver.cs" />
+    <Compile Include="share\MySql.Data\parameter.cs" />
+    <Compile Include="share\MySql.Data\parameter_collection.cs" />
+    <Compile Include="share\MySql.Data\PerformanceMonitor.cs" />
+    <Compile Include="share\MySql.Data\PreparableStatement.cs" />
+    <Compile Include="share\MySql.Data\ProcedureCache.cs" />
+    <Compile Include="share\MySql.Data\Properties\Resources.Designer.cs" />
+    <Compile Include="share\MySql.Data\ResultSet.cs" />
+    <Compile Include="share\MySql.Data\SchemaProvider.cs" />
+    <Compile Include="share\MySql.Data\Statement.cs" />
+    <Compile Include="share\MySql.Data\StoredProcedure.cs" />
+    <Compile Include="share\MySql.Data\TableCache.cs" />
+    <Compile Include="share\MySql.Data\TimedStream.cs" />
+    <Compile Include="share\MySql.Data\TracingDriver.cs" />
+    <Compile Include="share\MySql.Data\transaction.cs" />
+    <Compile Include="share\MySql.Data\Types\MetaData.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlBinary.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlBit.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlByte.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlConversionException.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlDateTime.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlDecimal.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlDouble.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlGeometry.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlGuid.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlInt16.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlInt32.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlInt64.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlSingle.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlString.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlTime.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlUByte.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlUInt16.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlUInt32.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlUInt64.cs" />
+    <Compile Include="share\MySql.Data\Types\MySqlValue.cs" />
+    <Compile Include="share\MySql.Data\zlib\Adler32.cs" />
+    <Compile Include="share\MySql.Data\zlib\Deflate.cs" />
+    <Compile Include="share\MySql.Data\zlib\InfBlocks.cs" />
+    <Compile Include="share\MySql.Data\zlib\InfCodes.cs" />
+    <Compile Include="share\MySql.Data\zlib\Inflate.cs" />
+    <Compile Include="share\MySql.Data\zlib\InfTree.cs" />
+    <Compile Include="share\MySql.Data\zlib\StaticTree.cs" />
+    <Compile Include="share\MySql.Data\zlib\SupportClass.cs" />
+    <Compile Include="share\MySql.Data\zlib\Tree.cs" />
+    <Compile Include="share\MySql.Data\zlib\ZInputStream.cs" />
+    <Compile Include="share\MySql.Data\zlib\Zlib.cs" />
+    <Compile Include="share\MySql.Data\zlib\ZOutputStream.cs" />
+    <Compile Include="share\MySql.Data\zlib\ZStream.cs" />
+    <Compile Include="share\MySql.Data\zlib\ZStreamException.cs" />
+    <Compile Include="share\SmartThreadPool\CallerThreadContext.cs" />
+    <Compile Include="share\SmartThreadPool\CanceledWorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\EventWaitHandleFactory.cs" />
+    <Compile Include="share\SmartThreadPool\Exceptions.cs" />
+    <Compile Include="share\SmartThreadPool\Interfaces.cs" />
+    <Compile Include="share\SmartThreadPool\InternalInterfaces.cs" />
+    <Compile Include="share\SmartThreadPool\PriorityQueue.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
+    <Compile Include="share\SmartThreadPool\STPEventWaitHandle.cs" />
+    <Compile Include="share\SmartThreadPool\STPPerformanceCounter.cs" />
+    <Compile Include="share\SmartThreadPool\STPStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\SynchronizedDictionary.cs" />
+    <Compile Include="share\SmartThreadPool\WIGStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.WorkItemResult.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemFactory.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemResultTWrapper.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroupBase.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsQueue.cs" />
+    <Compile Include="share\Tools\FileTool.cs" />
+    <Compile Include="share\Tools\ParsingTarget.cs" />
+    <Compile Include="share\Tools\ThreadTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="share\CommandLineArgumentsParser\Doc\CommandLineParser.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlCommand.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlCommandBuilder.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlConnection.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlConnectionStringBuilder.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlDataAdapter.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlDataReader.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlException.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlHelper.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlParameter.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlParameterCollection.xml" />
+    <Content Include="share\MySql.Data\docs\MySqlTransaction.xml" />
+    <Content Include="share\MySql.Data\Properties\keywords.txt" />
+    <Content Include="share\MySql.Data\Properties\ReservedWords.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="share\MySql.Data\Properties\Resources.resx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

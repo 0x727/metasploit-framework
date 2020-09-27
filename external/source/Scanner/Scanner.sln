@@ -14,6 +14,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smbTests", "smbTests\smbTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "port", "port.csproj", "{FB2DAA61-C8BD-472C-8DEE-6A3E9FB9A2A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mssql", "mssql.csproj", "{B67C91F5-B72A-4234-B653-5DE1C2DF5058}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mysql", "mysql.csproj", "{A1AFB841-A0D4-4D3C-8244-382072DCAD78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +40,14 @@ Global
 		{FB2DAA61-C8BD-472C-8DEE-6A3E9FB9A2A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB2DAA61-C8BD-472C-8DEE-6A3E9FB9A2A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB2DAA61-C8BD-472C-8DEE-6A3E9FB9A2A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67C91F5-B72A-4234-B653-5DE1C2DF5058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67C91F5-B72A-4234-B653-5DE1C2DF5058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67C91F5-B72A-4234-B653-5DE1C2DF5058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67C91F5-B72A-4234-B653-5DE1C2DF5058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
