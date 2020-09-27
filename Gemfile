@@ -30,7 +30,7 @@ group :development do
   # Metasploit::Aggregator external session proxy
   # disabled during 2.5 transition until aggregator is available
   #gem 'metasploit-aggregator'
-  gem 'metasploit_data_models', :path => '/home/lab/working/homados-working/metasploit_data_models'
+  gem 'metasploit_data_models', git: 'https://github.com/akkuman/metasploit_data_models.git', branch: 'feature/add_module_result_table'
 end
 
 group :development, :test do
