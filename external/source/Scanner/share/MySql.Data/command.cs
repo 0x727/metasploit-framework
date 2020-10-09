@@ -32,7 +32,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Generic;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 #if !CF
 using System.Transactions;
 #endif

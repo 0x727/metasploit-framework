@@ -29,7 +29,7 @@ using System.Diagnostics;
 using System.Data.SqlTypes;
 using MySql.Data.Types;
 using System.Collections;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 
 namespace MySql.Data.MySqlClient
 {

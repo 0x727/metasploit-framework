@@ -26,7 +26,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Diagnostics;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 using System.Runtime.InteropServices;
 using MySql.Data.MySqlClient;
 

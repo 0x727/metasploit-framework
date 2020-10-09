@@ -28,7 +28,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using MySql.Data.Common;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 #if BOUNCY_CASTLE_INCLUDED
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;

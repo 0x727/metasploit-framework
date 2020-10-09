@@ -22,7 +22,7 @@
 
 using System.IO;
 using System;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 using MySql.Data.Common;
 using System.Text;
 using System.Security.Cryptography;

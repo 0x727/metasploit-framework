@@ -25,7 +25,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Text;
 using MySql.Data.Common;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 
 namespace MySql.Data.MySqlClient
 {

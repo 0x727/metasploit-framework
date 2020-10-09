@@ -27,7 +27,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Text;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 using System.Collections;
 using System.Globalization;
 using System.Security;

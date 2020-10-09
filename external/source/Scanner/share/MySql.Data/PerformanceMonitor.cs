@@ -22,7 +22,7 @@
 
 using System;
 using System.Diagnostics;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 
 namespace MySql.Data.MySqlClient
 {

@@ -28,7 +28,7 @@ using MySql.Data.Types;
 using System.Data.SqlTypes;
 using System.Collections.Generic;
 using System.Globalization;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 using MySql.Data.Common;
 using System.Text.RegularExpressions;
 

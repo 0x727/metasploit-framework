@@ -33,7 +33,7 @@ using System.Text;
 using IsolationLevel = System.Data.IsolationLevel;
 using MySql.Data.Common;
 using System.Diagnostics;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 
 namespace MySql.Data.MySqlClient
 {

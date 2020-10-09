@@ -32,7 +32,7 @@ using MySql.Data.Types;
 using System.Collections.Specialized;
 using System.Collections;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 
 namespace MySql.Data.MySqlClient
 {
@@ -844,7 +844,7 @@ namespace MySql.Data.MySqlClient
       dt.Columns.Add(new DataColumn(DbMetaDataColumnNames.ReservedWord, typeof(string)));
 
       Stream str = Assembly.GetExecutingAssembly().GetManifestResourceStream(
-        "MySql.Data.MySqlClient.Properties.ReservedWords.txt");
+        "mysql.Properties.ReservedWords.txt");
       StreamReader sr = new StreamReader(str);
       string line = sr.ReadLine();
       while (line != null)

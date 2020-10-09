@@ -430,7 +430,8 @@ namespace scanner.port
 				{
 					if (!lstHostAlive.Contains(ip))
 					{
-						Console.WriteLine("[{3}] {0} is up: ({1} ms {2} ttl)", ip, e.Reply.RoundtripTime, e.Reply.Options.Ttl, DateTime.Now.ToString("MM/dd HH:mm:ss"));
+						if (ShowVerbose)
+							Console.WriteLine("[{3}] {0} is up: ({1} ms {2} ttl)", ip, e.Reply.RoundtripTime, e.Reply.Options.Ttl, DateTime.Now.ToString("MM/dd HH:mm:ss"));
 						lock (lockObjForCount)
 						{
 							upCount++;

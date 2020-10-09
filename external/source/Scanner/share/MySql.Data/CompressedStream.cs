@@ -23,7 +23,7 @@
 using System;
 using System.IO;
 using zlib;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 using MySql.Data.Common;
 
 namespace MySql.Data.MySqlClient

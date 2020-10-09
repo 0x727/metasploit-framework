@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -37,6 +37,11 @@
     <Compile Include="Model\Server.cs" />
     <Compile Include="Model\ServiceModel.cs" />
     <Compile Include="mysql\main.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
@@ -122,7 +127,6 @@
     <Compile Include="share\MySql.Data\PerformanceMonitor.cs" />
     <Compile Include="share\MySql.Data\PreparableStatement.cs" />
     <Compile Include="share\MySql.Data\ProcedureCache.cs" />
-    <Compile Include="share\MySql.Data\Properties\Resources.Designer.cs" />
     <Compile Include="share\MySql.Data\ResultSet.cs" />
     <Compile Include="share\MySql.Data\SchemaProvider.cs" />
     <Compile Include="share\MySql.Data\Statement.cs" />
@@ -193,6 +197,7 @@
     <Compile Include="share\Tools\ThreadTool.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\keywords.txt" />
     <Content Include="share\CommandLineArgumentsParser\Doc\CommandLineParser.xml" />
     <Content Include="share\MySql.Data\docs\MySqlCommand.xml" />
     <Content Include="share\MySql.Data\docs\MySqlCommandBuilder.xml" />
@@ -205,8 +210,6 @@
     <Content Include="share\MySql.Data\docs\MySqlParameter.xml" />
     <Content Include="share\MySql.Data\docs\MySqlParameterCollection.xml" />
     <Content Include="share\MySql.Data\docs\MySqlTransaction.xml" />
-    <Content Include="share\MySql.Data\Properties\keywords.txt" />
-    <Content Include="share\MySql.Data\Properties\ReservedWords.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -221,7 +224,10 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="share\MySql.Data\Properties\Resources.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

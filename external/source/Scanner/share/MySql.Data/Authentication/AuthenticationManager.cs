@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 
 namespace MySql.Data.MySqlClient.Authentication
 {

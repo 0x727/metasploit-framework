@@ -26,6 +26,7 @@ namespace Tools
         public int retryCount = 0;
         public int maxThread = 50;
         public int timeOut = 5;
+        public int logLevel = 2;
 
         public Boolean crackerOneCount = true;//只检查一个账户
         public int successCount = 0;
@@ -43,16 +44,19 @@ namespace Tools
 
         public void LogWarning(string strLog)
         {
+            if (logLevel < 1) return;
             Console.WriteLine("Warning: " + strLog);
         }
 
         public void LogInfo(string strLog)
         {
+            if (logLevel < 2) return;
             Console.WriteLine("Info: " + strLog);
         }
 
         public void LogError(string strLog)
         {
+            if (logLevel < 3) return;
             Console.WriteLine("Error: " + strLog);
         }
 

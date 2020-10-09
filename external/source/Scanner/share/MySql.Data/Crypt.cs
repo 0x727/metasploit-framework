@@ -25,7 +25,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using MySql.Data.Common;
-using MySql.Data.MySqlClient.Properties;
+using mysql.Properties;
 using System.Security.Cryptography;
 //#if CF
 //using OpenNETCF.Security.Cryptography;
