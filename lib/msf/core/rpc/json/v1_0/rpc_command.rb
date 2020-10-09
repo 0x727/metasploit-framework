@@ -130,7 +130,8 @@ module Msf::RPC::JSON
       # @param hash [Hash] input hash
       # @returns [Hash] a new hash with strings for the keys.
       def stringify_names(hash)
-        JSON.parse(JSON.dump(hash), symbolize_names: false)
+        parser = Yajl::Parser.new(:symbolize_names => false)
+        parser.parse(Yajl.dump(hash))
       end
 
       # Perform custom post processing of the execute result data.
