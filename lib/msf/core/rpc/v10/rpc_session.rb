@@ -698,7 +698,7 @@ class RPC_Session < RPC_Base
   # @example Here's how you would use this from the client:
   #  rpc.call('session.meterpreter_upload_file', 3, '1.txt', '1.txt')
   def rpc_meterpreter_upload_file(sid, src, dest)
-    s = _valid_session(sid,"meterpreter")
+    s = _valid_session(sid, "meterpreter")
 
     begin
       src = Msf::Config.loot_directory + File::SEPARATOR + src
@@ -706,7 +706,7 @@ class RPC_Session < RPC_Base
       if (stat.directory?)
         s.fs.dir.upload(dest, src, recursive)
       elsif (stat.file?)
-        if s.fs.file.exist?(dest) && client.fs.file.stat(dest).directory?
+        if s.fs.file.exist?(dest) && s.fs.file.stat(dest).directory?
           s.fs.file.upload(dest, src)
         else
           s.fs.file.upload_file(dest, src)
@@ -716,6 +716,35 @@ class RPC_Session < RPC_Base
     rescue ::Exception => e
       error(500, "#{e.class} #{e}")
     end
+  end
+
+  # get then content of special file
+  # 
+  # @param [Integer] sid Session ID
+  # @param [String] filepath the path of file
+  # @return [Hash] A hash indicating the action was successful and the content of file.
+  #  * 'result' [String] 'success'
+  #  * 'data' [String] the content of file
+  # @example Here's how you would use this from the client:
+  #  rpc.call('session.meterpreter_cat_file', 3, 'C:\\Users\\Akkuman\\Desktop\\1.txt')
+  def rpc_meterpreter_cat_file(sid, filepath)
+    s = _valid_session(sid, "meterpreter")
+
+    content = ''
+    if (s.fs.file.stat(filepath).directory?)
+      return error(500, "#{filepath} is a directory")
+    else
+      fd = s.fs.file.new(filepath, "rb")
+      begin
+        until fd.eof?
+          content << fd.read
+        end
+      # EOFError is raised if file is empty, do nothing, just catch
+      rescue EOFError
+      end
+      fd.close
+    end
+    { :result => 'success', :data => content }
   end
 
 
@@ -785,6 +814,35 @@ class RPC_Session < RPC_Base
     rescue ::Exception => e
       error(500, "list file error: #{e.class} #{e}")
     end
+  end
+
+  # Delete multiple files or folders
+  # 
+  # @param [Integer] sid Session ID
+  # @param [Hash] paths a hash contains dirs and files which will be deleted
+  # 
+  # @return [Hash] A hash indicating the action was successful. It contains the following key:
+  #   * 'result' [String] 'success'
+  # @example Here's how you would use this from the client
+  #  rpc.call('session.meterpreter_rm', 3, {"dirs": ["C:\\Users\\Akkuman\\Desktop"], "files": ["C:\\Users\\Akkuman\\Desktop\\1.txt"]})
+  def rpc_meterpreter_rm(sid, paths)
+    s = _valid_session(sid, "meterpreter")
+
+    dirs, files = paths['dirs'] || [], paths['files'] || []
+    path_expand_regex = /\%(\w*)\%/
+    # rm file
+    # reference: lib/rex/post/meterpreter/ui/console/command_dispatcher/stdapi/fs.rb#cmd_rm
+    files.each do |file_path|
+      file_path = s.fs.file.expand_path(file_path) if file_path =~ path_expand_regex
+      s.fs.file.rm(file_path)
+    end
+    # rmdir
+    # reference: lib/rex/post/meterpreter/ui/console/command_dispatcher/stdapi/fs.rb#cmd_rmdir
+    dirs.each { |dir_path|
+      dir_path = s.fs.file.expand_path(dir_path) if dir_path =~ path_expand_regex
+      s.fs.dir.rmdir(dir_path)
+    }
+    { :result => 'success' }
   end
 
 
