@@ -179,7 +179,7 @@ class MetasploitModule < Msf::Post
       end
       print_line(tbl.to_s)
       if tbl.rows.count
-        path = store_loot('host.securecrt_password', 'text/plain', session, tbl, 'securecrt_password.txt', 'SecureCRT Passwords')
+        path = store_loot('host.securecrt_password', 'text/plain', session, tbl.to_s, 'securecrt_password.txt', 'SecureCRT Passwords')
         print_good("Passwords stored in: #{path}")
       end
     else

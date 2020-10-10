@@ -451,6 +451,7 @@ PLATFORMS
 
 DEPENDENCIES
   factory_bot_rails
+  faye-websocket
   fivemat
   memory_profiler
   metasploit-framework!
