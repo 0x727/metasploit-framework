@@ -386,8 +386,9 @@ module Auxiliary::Report
   # ignored if there is no database
   #
   def store_loot(ltype, ctype, host, data, filename=nil, info=nil, service=nil)
-    if ! ::File.directory?(Msf::Config.loot_directory)
-      FileUtils.mkdir_p(Msf::Config.loot_directory)
+    loot_dir = ::File.join(Msf::Config.loot_directory, 'store_loot')
+    if ! ::File.directory?(loot_dir)
+      FileUtils.mkdir_p(loot_dir)
     end
 
     ext = 'bin'
@@ -413,7 +414,7 @@ module Auxiliary::Report
 
     name.gsub!(/[^a-z0-9\.\_]+/i, '')
 
-    path = File.join(Msf::Config.loot_directory, name)
+    path = File.join(loot_dir, name)
     full_path = ::File.expand_path(path)
     File.open(full_path, "wb") do |fd|
       fd.write(data)
