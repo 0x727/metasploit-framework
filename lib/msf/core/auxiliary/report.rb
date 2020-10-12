@@ -402,6 +402,7 @@ module Auxiliary::Report
     case ctype
     when /^text\/[\w\.]+$/
       ext = "txt"
+      data = data.to_s
     end
     # This method is available even if there is no database, don't bother checking
     host = Msf::Util::Host.normalize_host(host)
