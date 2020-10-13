@@ -505,7 +505,7 @@ class RPC_Module < RPC_Base
         s = self.framework.sessions[sid.to_i]
       end
     end
-    if mtype == 'post'
+    if mtype != 'payload'
       pipe = ModuleExecutePipe.new
       pipe.create_subscriber_proc(
         mod.uuid, &proc { |output|
@@ -767,12 +767,16 @@ private
   end
 
   def _run_exploit(mod, opts)
-    s = Msf::Simple::Exploit.exploit_simple(mod, {
+    options = {
       'Payload'  => opts['PAYLOAD'],
       'Target'   => opts['TARGET'],
       'RunAsJob' => true,
-      'Options'  => opts
-    })
+      'Options'  => opts,
+    }
+    if mod.fullname != 'exploit/multi/handler'
+      options['LocalOutput'] = opts['LocalOutput']
+    end
+    s = Msf::Simple::Exploit.exploit_simple(mod, options)
     {
       "job_id" => mod.job_id,
       "uuid" => mod.uuid
@@ -783,7 +787,8 @@ private
     uuid, job = Msf::Simple::Auxiliary.run_simple(mod,{
       'Action'   => opts['ACTION'],
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput']
     }, job_listener: self.job_status_tracker)
     {
       "job_id" => job,
@@ -831,7 +836,8 @@ private
       'Payload'  => opts['PAYLOAD'],
       'Target'   => opts['TARGET'],
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput']
     })
 
     {
