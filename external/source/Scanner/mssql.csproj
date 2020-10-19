@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B67C91F5-B72A-4234-B653-5DE1C2DF5058}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>mssql</RootNamespace>
+    <AssemblyName>mssql</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Model\CrackService.cs" />
+    <Compile Include="Model\CrackSQLServer.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Model\ServiceModel.cs" />
+    <Compile Include="mssql\main.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\DirectoryArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\EnumeratedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FileArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\RegexValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Compatibility\TypeExtensions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Exceptions\Exceptions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentGroupCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentRequiresOtherArgumentsCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\DistinctGroupsCertification.cs" />
+    <Compile Include="share\Exception\IPBreakException.cs" />
+    <Compile Include="share\Exception\IPUserBreakException.cs" />
+    <Compile Include="share\SmartThreadPool\CallerThreadContext.cs" />
+    <Compile Include="share\SmartThreadPool\CanceledWorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\EventWaitHandleFactory.cs" />
+    <Compile Include="share\SmartThreadPool\Exceptions.cs" />
+    <Compile Include="share\SmartThreadPool\Interfaces.cs" />
+    <Compile Include="share\SmartThreadPool\InternalInterfaces.cs" />
+    <Compile Include="share\SmartThreadPool\PriorityQueue.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
+    <Compile Include="share\SmartThreadPool\STPEventWaitHandle.cs" />
+    <Compile Include="share\SmartThreadPool\STPPerformanceCounter.cs" />
+    <Compile Include="share\SmartThreadPool\STPStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\SynchronizedDictionary.cs" />
+    <Compile Include="share\SmartThreadPool\WIGStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.WorkItemResult.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemFactory.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemResultTWrapper.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroupBase.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsQueue.cs" />
+    <Compile Include="share\Tools\FileTool.cs" />
+    <Compile Include="share\Tools\HostTool.cs" />
+    <Compile Include="share\Tools\ParsingTarget.cs" />
+    <Compile Include="share\Tools\ThreadTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="share\CommandLineArgumentsParser\Doc\CommandLineParser.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+//using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace CommandLineParser
@@ -323,14 +323,14 @@ namespace CommandLineParser
         {
             Type targetType = parsingTarget.GetType();
 
-            MemberInfo[] fields = targetType.GetFields();
+            System.Reflection.MemberInfo[] fields = targetType.GetFields();
 
-            MemberInfo[] properties = targetType.GetProperties();
+            System.Reflection.MemberInfo[] properties = targetType.GetProperties();
 
-            List<MemberInfo> fieldAndProps = new List<MemberInfo>(fields);
+            List<System.Reflection.MemberInfo> fieldAndProps = new List<System.Reflection.MemberInfo>(fields);
             fieldAndProps.AddRange(properties);
 
-            foreach (MemberInfo info in fieldAndProps)
+            foreach (System.Reflection.MemberInfo info in fieldAndProps)
             {
                 var attrs = info.GetCustomAttributes(typeof(ArgumentAttribute), true).ToArray();
 

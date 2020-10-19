@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{524B6B09-84E2-45CA-AF65-3466D44A78CF}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>rdp</RootNamespace>
+    <AssemblyName>rdp</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>scanner.rdp.main</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Model\CrackRDP.cs" />
+    <Compile Include="Model\CrackService.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Model\ServiceModel.cs" />
+    <Compile Include="rdp\main.cs" />
+    <Compile Include="rdp\RdpFull\Cryptography\ABCDStruct.cs" />
+    <Compile Include="rdp\RdpFull\Cryptography\HMACT64.cs" />
+    <Compile Include="rdp\RdpFull\Cryptography\MD4.cs" />
+    <Compile Include="rdp\RdpFull\Cryptography\MD4Managed.cs" />
+    <Compile Include="rdp\RdpFull\Cryptography\MD5.cs" />
+    <Compile Include="rdp\RdpFull\Cryptography\RC4.cs" />
+    <Compile Include="rdp\RdpFull\Encoding\ASCIIEncoding.cs" />
+    <Compile Include="rdp\RdpFull\Exceptions\RDFatalException.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Negotiation\ASN1.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Negotiation\CredSSP.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Negotiation\MCS.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Negotiation\NTLM.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Negotiation\RdpPacket.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Network\Network.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Network\NetworkSocket.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Network\PacketLogger.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Processing\ISO.cs" />
+    <Compile Include="rdp\RdpFull\Protocol\Processing\IsoLayer.cs" />
+    <Compile Include="rdp\RdpFull\Settings\Options.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\AdditionalArgumentsSettings.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\DirectoryArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\EnumeratedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FileArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\RegexValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Compatibility\TypeExtensions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Exceptions\Exceptions.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentGroupCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentRequiresOtherArgumentsCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\DistinctGroupsCertification.cs" />
+    <Compile Include="share\Exception\IPBreakException.cs" />
+    <Compile Include="share\Exception\IPUserBreakException.cs" />
+    <Compile Include="share\SmartThreadPool\CallerThreadContext.cs" />
+    <Compile Include="share\SmartThreadPool\CanceledWorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\EventWaitHandleFactory.cs" />
+    <Compile Include="share\SmartThreadPool\Exceptions.cs" />
+    <Compile Include="share\SmartThreadPool\Interfaces.cs" />
+    <Compile Include="share\SmartThreadPool\InternalInterfaces.cs" />
+    <Compile Include="share\SmartThreadPool\PriorityQueue.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.cs" />
+    <Compile Include="share\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
+    <Compile Include="share\SmartThreadPool\STPEventWaitHandle.cs" />
+    <Compile Include="share\SmartThreadPool\STPPerformanceCounter.cs" />
+    <Compile Include="share\SmartThreadPool\STPStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\SynchronizedDictionary.cs" />
+    <Compile Include="share\SmartThreadPool\WIGStartInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItem.WorkItemResult.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemFactory.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemInfo.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemResultTWrapper.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroup.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsGroupBase.cs" />
+    <Compile Include="share\SmartThreadPool\WorkItemsQueue.cs" />
+    <Compile Include="share\Tools\FileTool.cs" />
+    <Compile Include="share\Tools\HostTool.cs" />
+    <Compile Include="share\Tools\ParsingTarget.cs" />
+    <Compile Include="share\Tools\ThreadTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="share\CommandLineArgumentsParser\Doc\CommandLineParser.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

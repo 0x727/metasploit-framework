@@ -26,6 +26,7 @@ namespace Tools
         public int retryCount = 0;
         public int maxThread = 50;
         public int timeOut = 5;
+        public int logLevel = 2;
 
         public Boolean crackerOneCount = true;//只检查一个账户
         public int successCount = 0;
@@ -43,16 +44,19 @@ namespace Tools
 
         public void LogWarning(string strLog)
         {
+            if (logLevel < 3) return;
             Console.WriteLine("Warning: " + strLog);
         }
 
         public void LogInfo(string strLog)
         {
+            if (logLevel < 2) return;
             Console.WriteLine("Info: " + strLog);
         }
 
         public void LogError(string strLog)
         {
+            if (logLevel < 1) return;
             Console.WriteLine("Error: " + strLog);
         }
 
@@ -220,109 +224,127 @@ namespace Tools
 
         private Boolean initTargetAndDic(string strServiceName, string txt_target, string txt_username, string txt_password)
         {
+            List<Interval> lstIPInterval = HostTool.GetHosts(txt_target);
 
-            if ("".Equals(txt_target))
+            this.list_target.Clear();
+            foreach (Interval interval in lstIPInterval)
             {
-                LogError("请设置需要检查的目标的IP地址或域名！");
-                return false;
-            }
-            //else if (this.services_list.CheckedItems.Count <= 0)
-            //{
-            //    MessageBox.Show("请选择需要检查服务！");
-            //    return false;
-            //}
-            else
-            {
-                if (!"".Equals(txt_target))
+
+                if (interval.st != interval.ed)
                 {
-
-                    bool isTrue = Regex.IsMatch(txt_target, "^([\\w\\-\\.]{1,100}[a-zA-Z]{1,8})$|^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$");
-                    if (isTrue)
+                    for (long l = interval.st; l <= interval.ed; l++)
                     {
-                        this.list_target.Clear();
-                        this.list_target.Add(txt_target);
-                    }
-                    else
-                    {
-                        isTrue = Regex.IsMatch(txt_target, "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$");
-
-                        if (isTrue)
-                        {
-                            this.list_target.Clear();
-                            string[] ips = txt_target.Split('-');
-                            if (ips.Length == 2)
-                            {
-                                string startip = ips[0];
-                                string endip = ips[1];
-                                string[] startips = startip.Split('.');
-                                string[] endips = endip.Split('.');
-                                if (startips.Length == 4 && endips.Length == 4)
-                                {
-                                    int startips_3 = int.Parse(startips[2]);
-                                    int endips_3 = int.Parse(endips[2]);
-                                    int startips_4 = int.Parse(startips[3]);
-                                    int endips_4 = int.Parse(endips[3]);
-
-                                    if (endips_3 >= startips_3 && endips_3 <= 255 && endips_4 <= 255)
-                                    {
-
-                                        for (int i = startips_3; i <= endips_3; i++)
-                                        {
-
-                                            if (startips_3 == endips_3)
-                                            {
-                                                if (startips_4 <= endips_4)
-                                                {
-                                                    for (int j = startips_4; j <= endips_4; j++)
-                                                    {
-                                                        string ip = startips[0] + "." + startips[1] + "." + startips[2] + "." + j;
-                                                        this.list_target.Add(ip);
-                                                    }
-                                                }
-
-                                            }
-                                            else
-                                            {
-                                                int index_start = 0;
-                                                int index_end = 255;
-                                                if (i == startips_3)
-                                                {
-                                                    index_start = startips_4;
-                                                }
-                                                if (i == endips_3)
-                                                {
-                                                    index_end = endips_4;
-                                                }
-
-                                                for (int j = index_start; j <= index_end; j++)
-                                                {
-                                                    string ip = startips[0] + "." + startips[1] + "." + i + "." + j;
-                                                    this.list_target.Add(ip);
-                                                }
-
-                                            }
-                                        }
-
-                                    }
-                                }
-
-                            }
-
-
-                        }
-                        else
-                        {
-                            this.list_target = this.list_import_target;
-                        }
-                    }
-                    if (this.list_target.Count <= 0)
-                    {
-                        LogError("目标格式错误！\r\n格式示例：\r\n192.168.1.1\r\nwww.baidu.com\r\n192.168.1.1-192.168.200.1\r\n192.168.1.1-192.168.1.200");
-                        return false;
+                        this.list_target.Add(HostTool.LongToIP(l));
                     }
                 }
-
+                else
+                {
+                    this.list_target.Add(HostTool.LongToIP(interval.st));
+                }
             }
+
+            //if ("".Equals(txt_target))
+            //{
+            //    LogError("请设置需要检查的目标的IP地址或域名！");
+            //    return false;
+            //}
+            ////else if (this.services_list.CheckedItems.Count <= 0)
+            ////{
+            ////    MessageBox.Show("请选择需要检查服务！");
+            ////    return false;
+            ////}
+            //else
+            //{
+            //    if (!"".Equals(txt_target))
+            //    {
+
+            //        bool isTrue = Regex.IsMatch(txt_target, "^([\\w\\-\\.]{1,100}[a-zA-Z]{1,8})$|^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$");
+            //        if (isTrue)
+            //        {
+            //            this.list_target.Clear();
+            //            this.list_target.Add(txt_target);
+            //        }
+            //        else
+            //        {
+            //            isTrue = Regex.IsMatch(txt_target, "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$");
+
+            //            if (isTrue)
+            //            {
+            //                this.list_target.Clear();
+            //                string[] ips = txt_target.Split('-');
+            //                if (ips.Length == 2)
+            //                {
+            //                    string startip = ips[0];
+            //                    string endip = ips[1];
+            //                    string[] startips = startip.Split('.');
+            //                    string[] endips = endip.Split('.');
+            //                    if (startips.Length == 4 && endips.Length == 4)
+            //                    {
+            //                        int startips_3 = int.Parse(startips[2]);
+            //                        int endips_3 = int.Parse(endips[2]);
+            //                        int startips_4 = int.Parse(startips[3]);
+            //                        int endips_4 = int.Parse(endips[3]);
+
+            //                        if (endips_3 >= startips_3 && endips_3 <= 255 && endips_4 <= 255)
+            //                        {
+
+            //                            for (int i = startips_3; i <= endips_3; i++)
+            //                            {
+
+            //                                if (startips_3 == endips_3)
+            //                                {
+            //                                    if (startips_4 <= endips_4)
+            //                                    {
+            //                                        for (int j = startips_4; j <= endips_4; j++)
+            //                                        {
+            //                                            string ip = startips[0] + "." + startips[1] + "." + startips[2] + "." + j;
+            //                                            this.list_target.Add(ip);
+            //                                        }
+            //                                    }
+
+            //                                }
+            //                                else
+            //                                {
+            //                                    int index_start = 0;
+            //                                    int index_end = 255;
+            //                                    if (i == startips_3)
+            //                                    {
+            //                                        index_start = startips_4;
+            //                                    }
+            //                                    if (i == endips_3)
+            //                                    {
+            //                                        index_end = endips_4;
+            //                                    }
+
+            //                                    for (int j = index_start; j <= index_end; j++)
+            //                                    {
+            //                                        string ip = startips[0] + "." + startips[1] + "." + i + "." + j;
+            //                                        this.list_target.Add(ip);
+            //                                    }
+
+            //                                }
+            //                            }
+
+            //                        }
+            //                    }
+
+            //                }
+
+
+            //            }
+            //            else
+            //            {
+            //                this.list_target = this.list_import_target;
+            //            }
+            //        }
+            //        if (this.list_target.Count <= 0)
+            //        {
+            //            LogError("目标格式错误！\r\n格式示例：\r\n192.168.1.1\r\nwww.baidu.com\r\n192.168.1.1-192.168.200.1\r\n192.168.1.1-192.168.1.200");
+            //            return false;
+            //        }
+            //    }
+
+            //}
             //加载自定义字典字典
             //if (notAutoSelectDic)
             {
@@ -423,7 +445,12 @@ namespace Tools
             this.list_ip_user_break.Clear();
 
             stp = new SmartThreadPool();
-            stp.MaxThreads = maxThread;
+           
+            if (this.list_target.Count < maxThread)
+                stp.MaxThreads = this.list_target.Count;
+            else
+                stp.MaxThreads = maxThread;
+
             //creackerSumCount = 0;
             //scanPortsSumCount = 0;
 
