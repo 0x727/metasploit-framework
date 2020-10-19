@@ -88,7 +88,7 @@ class MetasploitModule < Msf::Post
             end
         end
 
-        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['THREADS'] < 300
+        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['CONNECT_TIMEOUT'] < 300
             datastore['ARGUMENTS'] += ' -o ' + datastore['CONNECT_TIMEOUT'].toString()
         end
 
@@ -103,7 +103,7 @@ class MetasploitModule < Msf::Post
         end
 
         if datastore['RPORT'] != nil and datastore['RPORT'].positive? and datastore['RPORT'] < 65536
-            if datastore['RPORT'] != 21
+            if datastore['RPORT'] != 3306
                 datastore['ARGUMENTS'] += ' -p ' + datastore['RPORT'].toString()
             end
         else

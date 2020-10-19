@@ -33,7 +33,7 @@ class MetasploitModule < Msf::Post
                 OptInt.new('TIMEOUT', [false, '等待返回结果的超时时间（单位：秒）', 600]),
 
                 OptString.new('RHOST', [true, '目标主机地址，格式示例：192.168.1.1,192.168.1.1-192.168.200.1,192.168.0.0/16']),
-                OptInt.new('RPORT', [true, '目标端口', 445]),
+                OptInt.new('RPORT', [true, '目标端口', 3389]),
                  OptInt.new('THREADS', [false, '最大并行线程数量，默认为50']),
                 OptBool.new('KILL', [true, '任务结束之后关闭进程', false]),
                 OptBool.new('STOP_ON_SUCCESS', [false, '开关：一个主机找到了一个凭据就停下来，默认为true', true]),
@@ -88,7 +88,7 @@ class MetasploitModule < Msf::Post
             end
         end
 
-        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['THREADS'] < 300
+        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['CONNECT_TIMEOUT'] < 300
             datastore['ARGUMENTS'] += ' -o ' + datastore['CONNECT_TIMEOUT'].toString()
         end
 
@@ -103,7 +103,7 @@ class MetasploitModule < Msf::Post
         end
 
         if datastore['RPORT'] != nil and datastore['RPORT'].positive? and datastore['RPORT'] < 65536
-            if datastore['RPORT'] != 21
+            if datastore['RPORT'] != 3389
                 datastore['ARGUMENTS'] += ' -p ' + datastore['RPORT'].toString()
             end
         else
