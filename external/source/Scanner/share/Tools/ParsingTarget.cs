@@ -4,7 +4,7 @@ namespace Tools
 {
     class ParsingTarget
     {
-        [ValueArgument(typeof(string), 'h', "host", Description = "Set target host ip/ips/domain. \r\n            Ex: 192.168.1.1  www.baidu.com  192.168.1.1-192.168.200.1  192.168.1.1-192.168.1.200", DefaultValue = "")]
+        [ValueArgument(typeof(string), 'h', "host", Description = "Set target host ip/ips/cidr. \r\n            Ex: 192.168.1.1,192.168.1.1-192.168.200.1,192.168.0.0/16", DefaultValue = "")]
         public string strTarget;
 
         [BoundedValueArgument(typeof(int), 'p', "port", MinValue = 1, MaxValue = 65535, Description = "Set target port[1,65535]", DefaultValue = -1)]

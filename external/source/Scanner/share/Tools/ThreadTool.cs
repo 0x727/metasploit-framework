@@ -445,7 +445,12 @@ namespace Tools
             this.list_ip_user_break.Clear();
 
             stp = new SmartThreadPool();
-            stp.MaxThreads = maxThread;
+           
+            if (this.list_target.Count < maxThread)
+                stp.MaxThreads = this.list_target.Count;
+            else
+                stp.MaxThreads = maxThread;
+
             //creackerSumCount = 0;
             //scanPortsSumCount = 0;
 

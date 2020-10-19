@@ -8,7 +8,7 @@ namespace scanner.port
 	class ParsingTargetPort
 	{
 #pragma warning disable 0649
-        [ValueArgument(typeof(string), 'h', "host", Description = "Set target host ip/ips/domain. \r\n            Ex: 192.168.1.1 192.168.1.1-192.168.200.1  192.168.1.1-192.168.1.200", DefaultValue = "")]
+        [ValueArgument(typeof(string), 'h', "host", Description = "Set target host ip/ips/cidr. \r\n            Ex: 192.168.1.1,192.168.1.1-192.168.200.1,192.168.0.0/16", DefaultValue = "")]
 		public string strTarget;
 
 		[ValueArgument(typeof(string), 'p', "port", Description = "Set target port. Ex: 22,80,100-200,3389")]
