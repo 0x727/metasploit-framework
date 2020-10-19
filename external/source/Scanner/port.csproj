@@ -39,10 +39,14 @@
     <Compile Include="share\CommandLineArgumentsParser\Arguments\Argument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\BoundedValueArgument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\CertifiedValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\DirectoryArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\EnumeratedValueArgument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\FieldArgumentBind.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\FileArgument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithDefaultValue.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\IArgumentWithForceDefaultValue.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\IValueArgument.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Arguments\RegexValueArgument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\SwitchArgument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Arguments\ValueArgument.cs" />
     <Compile Include="share\CommandLineArgumentsParser\CommandLineParser.cs" />
@@ -51,6 +55,12 @@
     <Compile Include="share\CommandLineArgumentsParser\IResource.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Messages.cs" />
     <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentGroupCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\ArgumentRequiresOtherArgumentsCertification.cs" />
+    <Compile Include="share\CommandLineArgumentsParser\Validation\DistinctGroupsCertification.cs" />
+    <Compile Include="share\Exception\IPBreakException.cs" />
+    <Compile Include="share\Exception\IPUserBreakException.cs" />
+    <Compile Include="share\Tools\HostTool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -61,7 +71,7 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="share\Tools\" />
+    <Content Include="share\CommandLineArgumentsParser\Doc\CommandLineParser.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

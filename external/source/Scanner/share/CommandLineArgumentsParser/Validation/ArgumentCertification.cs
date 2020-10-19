@@ -1,5 +1,5 @@
 using System;
-using System.Reflection;
+//using System.Reflection;
 using CommandLineParser.Compatibility;
 
 namespace CommandLineParser.Validation

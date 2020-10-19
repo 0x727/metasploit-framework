@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
+//using System.Reflection;
 
 namespace CommandLineParser.Arguments
 {
@@ -240,10 +240,10 @@ namespace CommandLineParser.Arguments
             if (Bind == null)
                 return;
 
-            MemberInfo info = Bind.Value.Object.GetType().GetMember(Bind.Value.Field)[0];
+            System.Reflection.MemberInfo info = Bind.Value.Object.GetType().GetMember(Bind.Value.Field)[0];
             Type boundType = null;
-            if (info is PropertyInfo) boundType = (info as PropertyInfo).PropertyType;
-            else if (info is FieldInfo) boundType = (info as FieldInfo).FieldType;
+            if (info is System.Reflection.PropertyInfo) boundType = (info as System.Reflection.PropertyInfo).PropertyType;
+            else if (info is System.Reflection.FieldInfo) boundType = (info as System.Reflection.FieldInfo).FieldType;
 
 
             //multiple value argument can be bound only to a proper collection
@@ -264,10 +264,10 @@ namespace CommandLineParser.Arguments
                         newValue = _value;
                     else
                         newValue = Values.ToArray();
-                    if (info is FieldInfo)
-                        (info as FieldInfo).SetValue(Bind.Value.Object, newValue);
-                    if (info is PropertyInfo)
-                        (info as PropertyInfo).SetValue(Bind.Value.Object, newValue, null);
+                    if (info is System.Reflection.FieldInfo)
+                        (info as System.Reflection.FieldInfo).SetValue(Bind.Value.Object, newValue);
+                    if (info is System.Reflection.PropertyInfo)
+                        (info as System.Reflection.PropertyInfo).SetValue(Bind.Value.Object, newValue, null);
                 }
                 else
                 {
@@ -284,25 +284,25 @@ namespace CommandLineParser.Arguments
             }
         }
 
-        private ICollection<TValue> InitializeTargetCollection(MemberInfo info)
+        private ICollection<TValue> InitializeTargetCollection(System.Reflection.MemberInfo info)
         {
             ICollection<TValue> targetCollection = null;
-            if (info is FieldInfo)
-                targetCollection = (ICollection<TValue>)(info as FieldInfo).GetValue(Bind.Value.Object);
-            else if (info is PropertyInfo)
-                targetCollection = (ICollection<TValue>)(info as PropertyInfo).GetValue(Bind.Value.Object, null);
+            if (info is System.Reflection.FieldInfo)
+                targetCollection = (ICollection<TValue>)(info as System.Reflection.FieldInfo).GetValue(Bind.Value.Object);
+            else if (info is System.Reflection.PropertyInfo)
+                targetCollection = (ICollection<TValue>)(info as System.Reflection.PropertyInfo).GetValue(Bind.Value.Object, null);
 
             if (targetCollection == null)
             {
-                if (info is FieldInfo)
+                if (info is System.Reflection.FieldInfo)
                 {
-                    targetCollection = (ICollection<TValue>)Activator.CreateInstance((info as FieldInfo).FieldType);
-                    (info as FieldInfo).SetValue(Bind.Value.Object, targetCollection);
+                    targetCollection = (ICollection<TValue>)Activator.CreateInstance((info as System.Reflection.FieldInfo).FieldType);
+                    (info as System.Reflection.FieldInfo).SetValue(Bind.Value.Object, targetCollection);
                 }
-                else if (info is PropertyInfo)
+                else if (info is System.Reflection.PropertyInfo)
                 {
-                    targetCollection = (ICollection<TValue>)Activator.CreateInstance((info as PropertyInfo).PropertyType);
-                    (info as PropertyInfo).SetValue(Bind.Value.Object, targetCollection, null);
+                    targetCollection = (ICollection<TValue>)Activator.CreateInstance((info as System.Reflection.PropertyInfo).PropertyType);
+                    (info as System.Reflection.PropertyInfo).SetValue(Bind.Value.Object, targetCollection, null);
                 }
             }
             targetCollection.Clear();
@@ -393,7 +393,7 @@ namespace CommandLineParser.Arguments
 #endif                    
                 }
 
-                MethodInfo parseMethod2 = valueType.GetMethod("Parse", new[] { typeof(string), typeof(CultureInfo) });
+                System.Reflection.MethodInfo parseMethod2 = valueType.GetMethod("Parse", new[] { typeof(string), typeof(CultureInfo) });
                 if (parseMethod2 != null)
                 {
                     if (parseMethod2.IsStatic && parseMethod2.ReturnType == valueType)
@@ -402,7 +402,7 @@ namespace CommandLineParser.Arguments
                     }
                 }
 
-                MethodInfo parseMethod1 = valueType.GetMethod("Parse", new[] { typeof(string) });
+                System.Reflection.MethodInfo parseMethod1 = valueType.GetMethod("Parse", new[] { typeof(string) });
                 if (parseMethod1 != null)
                 {
                     if (parseMethod1.IsStatic && parseMethod1.ReturnType == valueType)

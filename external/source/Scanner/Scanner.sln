@@ -18,6 +18,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mssql", "mssql.csproj", "{B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mysql", "mysql.csproj", "{A1AFB841-A0D4-4D3C-8244-382072DCAD78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssh", "ssh.csproj", "{171FCC6E-77ED-43CA-A898-EDAAC6A37FA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rdp", "rdp.csproj", "{524B6B09-84E2-45CA-AF65-3466D44A78CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,14 @@ Global
 		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1AFB841-A0D4-4D3C-8244-382072DCAD78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{171FCC6E-77ED-43CA-A898-EDAAC6A37FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{171FCC6E-77ED-43CA-A898-EDAAC6A37FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{171FCC6E-77ED-43CA-A898-EDAAC6A37FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{171FCC6E-77ED-43CA-A898-EDAAC6A37FA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524B6B09-84E2-45CA-AF65-3466D44A78CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524B6B09-84E2-45CA-AF65-3466D44A78CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524B6B09-84E2-45CA-AF65-3466D44A78CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524B6B09-84E2-45CA-AF65-3466D44A78CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -32,8 +32,8 @@ class MetasploitModule < Msf::Post
                 OptInt.new('PPID', [false, '创建新进程时用于 PPID spoofing 的进程标识符。 (0 = no PPID spoofing)', 0]),
                 OptInt.new('TIMEOUT', [false, '等待返回结果的超时时间（单位：秒）', 600]),
 
-                OptString.new('RHOST', [true, '目标主机地址，格式示例：192.168.1.1 ; www.baidu.com ; 192.168.1.1-192.168.200.1 ; 192.168.1.1-192.168.1.200']),
-                OptInt.new('RPORT', [true, '目标端口', 21]),
+                OptString.new('RHOST', [true, '目标主机地址，格式示例：192.168.1.1,192.168.1.1-192.168.200.1,192.168.0.0/16']),
+                OptInt.new('RPORT', [true, '目标端口', 445]),
                  OptInt.new('THREADS', [false, '最大并行线程数量，默认为50']),
                 OptBool.new('KILL', [true, '任务结束之后关闭进程', false]),
                 OptBool.new('STOP_ON_SUCCESS', [false, '开关：一个主机找到了一个凭据就停下来，默认为true', true]),

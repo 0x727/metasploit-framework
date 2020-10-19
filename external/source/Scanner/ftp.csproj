@@ -218,6 +218,7 @@
     <Compile Include="share\SmartThreadPool\WorkItemsGroupBase.cs" />
     <Compile Include="share\SmartThreadPool\WorkItemsQueue.cs" />
     <Compile Include="share\Tools\FileTool.cs" />
+    <Compile Include="share\Tools\HostTool.cs" />
     <Compile Include="share\Tools\ParsingTarget.cs" />
     <Compile Include="share\Tools\ThreadTool.cs" />
   </ItemGroup>

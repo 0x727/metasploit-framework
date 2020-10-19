@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using System.Net.NetworkInformation;
+using Tools;
 
 namespace scanner.port
 {
@@ -21,24 +22,6 @@ namespace scanner.port
 		public Socket Sock;
 		public Stopwatch RunTime;
 		public SocketAsyncEventArgs SAEA;
-	}
-
-	public class Interval
-	{
-		public Interval()
-		{
-			this.st = 0L;
-			this.ed = 0L;
-		}
-
-		public Interval(long s, long e)
-		{
-			this.st = s;
-			this.ed = e;
-		}
-
-		public long st;
-		public long ed;
 	}
 
 	class PortScan
@@ -59,7 +42,7 @@ namespace scanner.port
         private static List<MyTask> MyTasks = new List<MyTask>();
         private static List<int> ScanPorts = new List<int>();
 		private static BlockingCollection<IPEndPoint> IPES;
-		private static string TaskTempFile;
+		//private static string TaskTempFile;
         private static long NowProgress;
         private static long MaxProgress;
 
@@ -68,6 +51,7 @@ namespace scanner.port
 		//private static Queue<string> queueAliveHosts = new Queue<string>();
 		//private static object lockObjForList = new object();
 		private static List<string> lstHostAlive = new List<string>();
+		private static List<Interval> lstIPInterval = new List<Interval>();
 
 
 		public static event PortScan.AddPortScanValueEventHandler AddPortScanValue;
@@ -76,7 +60,7 @@ namespace scanner.port
 		public static void Start()
         {
 			PortScan.GetPorts();
-			PortScan.GetTasks();
+			PortScan.GetHosts();
 			PortScan.IPES = new BlockingCollection<IPEndPoint>(PortScan.MaxThread);
 			int maxThread = PortScan.MaxThread;
 			for (int i = 1; i <= maxThread; i++)
@@ -98,6 +82,7 @@ namespace scanner.port
             PortScan.NowProgress = 0L;
             PortScan.isRuning = true;
 			PortScan.ScanTime.Restart();
+			//Console.WriteLine("-----------------Detect alive:{0}", PortScan.DetectAlive);
 			if (PortScan.DetectAlive)
             {
 				Task.Factory.StartNew(new Action(PortScan.ScanAlive));
@@ -110,14 +95,6 @@ namespace scanner.port
 			Task.Factory.StartNew(new Action(PortScan.TakeTask));
 			Task.Factory.StartNew(new Action(PortScan.CheckTimeout));
         }
-
-        //public static string GetProgressValue()
-        //{
-        //    Thread.Sleep(1000);
-        //    string result = string.Format("{0} {1}/s", ((double)PortScan.NowProgress / (double)PortScan.MaxProgress * 100.0).ToString("0.00") + "%", PortScan.ScanSpeed.ToString());
-        //    PortScan.ScanSpeed = 0;
-        //    return result;
-        //}
 
         private static void GetPorts()
 		{
@@ -174,142 +151,37 @@ namespace scanner.port
 			}
 		}
 
-		private static void GetTasks()
+		private static void GetHosts()
 		{
-			string appPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-			if (File.Exists(PortScan.Host))
-			{
-				PortScan.TaskTempFile = PortScan.Host;
-			}
-			else
-			{
-				PortScan.TaskTempFile = appPath + "\\MyScanFile.tmp";
-				File.WriteAllText(PortScan.TaskTempFile, PortScan.Host.Replace(",", "\r\n"));
-			}
-			List<Interval> list = new List<Interval>();
-			int[] array = new int[4];
-			IPAddress ipaddress = null;
-			try
-			{
-				foreach (string text in File.ReadLines(PortScan.TaskTempFile))
-				{
-					if (text.Length != 0)
-					{
-						if (text.Contains("-"))
-						{
-							string[] array2 = text.Split(new char[]
-							{
-								'-'
-							});
-							if (array2.Length == 2)
-							{
-								long s = (long)((ulong)PortScan.IpToLong(array2[0]));
-								long e = (long)((ulong)PortScan.IpToLong(array2[1]));
-								list.Add(new Interval(s, e));
-							}
-						}
-						else if (text.Contains("/") && !text.Contains("://"))
-						{
-							string[] array2 = text.Split(new char[]
-							{
-								'/'
-							});
-							if (array2.Length == 2)
-							{
-								string text2 = array2[0];
-								string text3 = array2[1];
-								array2 = text2.Split(new char[]
-								{
-									'.'
-								});
-								int num = 0;
-								do
-								{
-									array[num] = int.Parse(array2[num]);
-									array2[num] = Convert.ToString(array[num], 2).PadLeft(8, '0');
-									num++;
-								}
-								while (num <= 3);
-								string text4 = string.Join("", array2);
-								text4 = text4.Substring(0, Convert.ToInt32(text3)).PadRight(32, '1');
-								int num2 = 0;
-								int num3 = 0;
-								do
-								{
-									array2[num2] = text4.Substring(num3, 8);
-									array[num2] = Convert.ToInt32(array2[num2], 2);
-									num2++;
-									num3 += 8;
-								}
-								while (num3 <= 31);
-								text3 = string.Join<int>(".", array);
-								long s = (long)((ulong)PortScan.IpToLong(text2));
-								long e = (long)((ulong)PortScan.IpToLong(text3));
-								list.Add(new Interval(s, e));
-							}
-						}
-						else
-						{
-							string text_tmp = text;
-							try
-							{
-								if (text.Contains("://"))
-								{
-									text_tmp = new Uri(text).Host;
-								}
-							}
-							catch
-							{
-							}
-							if (IPAddress.TryParse(text_tmp, out ipaddress))
-							{
-								list.Add(new Interval((long)((ulong)PortScan.IpToLong(text_tmp)), (long)((ulong)PortScan.IpToLong(text_tmp))));
-							}
-							else
-							{
-								try
-								{
-									text_tmp = Dns.GetHostEntry(text_tmp).AddressList[0].ToString();
-									list.Add(new Interval((long)((ulong)PortScan.IpToLong(text_tmp)), (long)((ulong)PortScan.IpToLong(text_tmp))));
-								}
-								catch
-								{
-								}
-							}
-						}
-					}
-				}
-			}
-			catch
-			{
-			}
+			lstIPInterval = HostTool.GetHosts(PortScan.Host);
 
-			PortScan.TaskTempFile = appPath + "\\MyScanFile.tmp";
-			StreamWriter streamWriter = new StreamWriter(PortScan.TaskTempFile);
-			List<Interval> list2 = PortScan.Merge(list);
-			long num4 = 0L;
-			try
-			{
-				foreach (Interval interval in list2)
-				{
-					if (interval.st != interval.ed)
-					{
-						streamWriter.WriteLine(PortScan.LongToIP(interval.st) + "-" + PortScan.LongToIP(interval.ed));
-						num4 += interval.ed - interval.st + 1L;
-					}
-					else
-					{
-						streamWriter.WriteLine(PortScan.LongToIP(interval.st));
-						num4 += 1L;
-					}
-				}
-			}
-			catch
-			{
-			}
-			streamWriter.Close();
-            PortScan.MaxProgress = (long)PortScan.ScanPorts.Count * num4;
-        }
+			//List<Interval> list = HostTool.GetHosts(PortScan.Host, tmpPath);
+			//PortScan.TaskTempFile = tmpPath;
+			//StreamWriter streamWriter = new StreamWriter(PortScan.TaskTempFile);
+			//List<Interval> list2 = HostTool.Merge(list);
+			//long num4 = 0L;
+			//try
+			//{
+			//	foreach (Interval interval in list2)
+			//	{
+			//		if (interval.st != interval.ed)
+			//		{
+			//			streamWriter.WriteLine(HostTool.LongToIP(interval.st) + "-" + HostTool.LongToIP(interval.ed));
+			//			num4 += interval.ed - interval.st + 1L;
+			//		}
+			//		else
+			//		{
+			//			streamWriter.WriteLine(HostTool.LongToIP(interval.st));
+			//			num4 += 1L;
+			//		}
+			//	}
+			//}
+			//catch
+			//{
+			//}
+			//streamWriter.Close();
+			//         PortScan.MaxProgress = (long)PortScan.ScanPorts.Count * num4;
+		}
 
 		private static void ScanAlive()
 		{
@@ -320,51 +192,75 @@ namespace scanner.port
 
 			int scanportNum = PortScan.ScanPorts.Count;
 			int MaxSocketNum = PortScan.MaxThread >= 5 ? PortScan.MaxThread / 5 : 1;
-			List<string> lstIP = new List<string>();
-			IPAddress ipaddress = null;
-			IPAddress ipaddress2 = null;
-			try
-			{
-				foreach (string text in File.ReadLines(PortScan.TaskTempFile))
-				{
-					if (!PortScan.isRuning)
-					{
-						break;
-					}
-					if (text.Contains("-"))
-					{
-						string[] array = text.Split(new char[] { '-' });
-						if (IPAddress.TryParse(array[0], out ipaddress) && IPAddress.TryParse(array[1], out ipaddress2))
-						{
-							long num = (long)((ulong)PortScan.IpToLong(array[0]));
-							long num2 = (long)((ulong)PortScan.IpToLong(array[1]));
-							for (long num3 = num; num3 <= num2; num3 += 1L)
-							{
-								if (!PortScan.isRuning)
-								{
-									break;
-								}
-								if (!lstIP.Contains(PortScan.LongToIP(num3)))
-									lstIP.Add(PortScan.LongToIP(num3));
-							}
-						}
-						else
-						{
-							if (!lstIP.Contains(text))
-								lstIP.Add(text);
-						}
-					}
-					else
-					{
-						if (!lstIP.Contains(text))
-							lstIP.Add(text);
-					}
-				}
+            List<string> lstIP = new List<string>();
+            //IPAddress ipaddress = null;
+            //IPAddress ipaddress2 = null;
+            try
+            {
+                //foreach (string text in File.ReadLines(PortScan.TaskTempFile))
+                //{
+                //	if (!PortScan.isRuning)
+                //	{
+                //		break;
+                //	}
+                //	if (text.Contains("-"))
+                //	{
+                //		string[] array = text.Split(new char[] { '-' });
+                //		if (IPAddress.TryParse(array[0], out ipaddress) && IPAddress.TryParse(array[1], out ipaddress2))
+                //		{
+                //			long num = (long)((ulong)HostTool.IpToLong(array[0]));
+                //			long num2 = (long)((ulong)HostTool.IpToLong(array[1]));
+                //			for (long num3 = num; num3 <= num2; num3 += 1L)
+                //			{
+                //				if (!PortScan.isRuning)
+                //				{
+                //					break;
+                //				}
+                //				if (!lstIP.Contains(HostTool.LongToIP(num3)))
+                //					lstIP.Add(HostTool.LongToIP(num3));
+                //			}
+                //		}
+                //		else
+                //		{
+                //			if (!lstIP.Contains(text))
+                //				lstIP.Add(text);
+                //		}
+                //	}
+                //	else
+                //	{
+                //		if (!lstIP.Contains(text))
+                //			lstIP.Add(text);
+                //	}
+                //}
+
+				//foreach (Interval interval in lstIPInterval)
+				//{
+				//	if (!PortScan.isRuning)
+				//	{
+				//		break;
+				//	}
+
+				//	if (interval.st != interval.ed)
+				//	{
+				//		for (long l = interval.st; l <= interval.ed; l++)
+				//		{
+				//			if (!lstIP.Contains(HostTool.LongToIP(l)))
+				//				lstIP.Add(HostTool.LongToIP(l));
+				//		}
+				//	}
+				//	else
+				//	{
+				//		if (!lstIP.Contains(HostTool.LongToIP(interval.st)))
+				//			lstIP.Add(HostTool.LongToIP(interval.st));
+				//	}
+				//}
+
+				//lstIPInterval = null;
 			}
 			catch
 			{
 			}
-			File.Delete(PortScan.TaskTempFile);
+			//File.Delete(PortScan.TaskTempFile);
 
 			string data = "AAAAAAAA";
 			byte[] buffer = Encoding.ASCII.GetBytes(data);
@@ -378,33 +274,69 @@ namespace scanner.port
 
 			int nCount = 0;
 			DateTime nLastTime = DateTime.Now;
-			foreach (string ip in lstIP)
+			//foreach (string ip in lstIP)
+			foreach (Interval interval in lstIPInterval)
 			{
 				if (!PortScan.isRuning)
 				{
 					break;
 				}
 
-				nCount++;
-				if (DateTime.Now.Subtract(nLastTime) > TimeSpan.FromSeconds(1))
+				if (interval.st != interval.ed)
 				{
-					if (ShowVerbose)
-						Console.WriteLine("[{2}] Took {0} seconds.  have {1} hosts active. Now detect IP: {3}.",
-						sw.ElapsedMilliseconds / 1000, upCount, DateTime.Now.ToString("MM/dd HH:mm:ss"), ip);
-					nLastTime = DateTime.Now;
+					for (long l = interval.st; l <= interval.ed; l++)
+					{
+						if (!PortScan.isRuning)
+						{
+							break;
+						}
+
+						nCount++;
+						if (DateTime.Now.Subtract(nLastTime) > TimeSpan.FromSeconds(1))
+						{
+							if (ShowVerbose)
+								Console.WriteLine("[{2}] Took {0} seconds.  have {1} hosts active. Now detect IP: {3}.",
+								sw.ElapsedMilliseconds / 1000, upCount, DateTime.Now.ToString("MM/dd HH:mm:ss"), HostTool.LongToIP(l));
+							nLastTime = DateTime.Now;
+						}
+						if (nCount % 10 == 0 && countdown.CurrentCount > MaxSocketNum)
+						{
+							Thread.Sleep(10);
+							continue;
+						}
+						for (int i = 0; i < 2; i++)
+						{
+							Ping p = new Ping();
+							p.PingCompleted += new PingCompletedEventHandler(p_PingCompleted);
+							countdown.AddCount();
+							p.SendAsync(HostTool.LongToIP(l), timeoutSecond * 1000, buffer, options, countdown);
+						}
+					}
 				}
-				if (nCount % 10 == 0 && countdown.CurrentCount > MaxSocketNum)
-				{
-					Thread.Sleep(10);
-					continue;
+				else
+                {
+					nCount++;
+					if (DateTime.Now.Subtract(nLastTime) > TimeSpan.FromSeconds(1))
+					{
+						if (ShowVerbose)
+							Console.WriteLine("[{2}] Took {0} seconds.  have {1} hosts active. Now detect IP: {3}.",
+							sw.ElapsedMilliseconds / 1000, upCount, DateTime.Now.ToString("MM/dd HH:mm:ss"), HostTool.LongToIP(interval.st));
+						nLastTime = DateTime.Now;
+					}
+					if (nCount % 10 == 0 && countdown.CurrentCount > MaxSocketNum)
+					{
+						Thread.Sleep(10);
+						continue;
+					}
+					for (int i = 0; i < 2; i++)
+					{
+						Ping p = new Ping();
+						p.PingCompleted += new PingCompletedEventHandler(p_PingCompleted);
+						countdown.AddCount();
+						p.SendAsync(HostTool.LongToIP(interval.st), timeoutSecond * 1000, buffer, options, countdown);
+					}
 				}
-				for (int i = 0; i < 2; i++)
-				{
-					Ping p = new Ping();
-					p.PingCompleted += new PingCompletedEventHandler(p_PingCompleted);
-					countdown.AddCount();
-					p.SendAsync(ip, timeoutSecond * 1000, buffer, options, countdown);
-				}
+
 			}
 
 			if (ShowVerbose)
@@ -454,48 +386,92 @@ namespace scanner.port
 
         private static void ReadTaskForNoDetectAlive()
         {
-            IPAddress ipaddress = null;
-            IPAddress ipaddress2 = null;
+            //IPAddress ipaddress = null;
+            //IPAddress ipaddress2 = null;
             try
             {
-                foreach (string text in File.ReadLines(PortScan.TaskTempFile))
-                {
-                    if (!PortScan.isRuning)
-                    {
-                        break;
-                    }
-                    if (text.Contains("-"))
-                    {
-                        string[] array = text.Split(new char[] { '-' });
-                        if (IPAddress.TryParse(array[0], out ipaddress) && IPAddress.TryParse(array[1], out ipaddress2))
-                        {
-                            long num = (long)((ulong)PortScan.IpToLong(array[0]));
-                            long num2 = (long)((ulong)PortScan.IpToLong(array[1]));
-                            for (long num3 = num; num3 <= num2; num3 += 1L)
-                            {
-                                if (!PortScan.isRuning)
-                                {
-                                    break;
-                                }
-                                PortScan.AddHost(PortScan.LongToIP(num3));
-                            }
-                        }
-                        else
-                        {
-                            PortScan.AddHost(text);
-                        }
-                    }
-                    else
-                    {
-                        PortScan.AddHost(text);
-                    }
-                }
-            }
+				//foreach (string text in File.ReadLines(PortScan.TaskTempFile))
+				//{
+				//    if (!PortScan.isRuning)
+				//    {
+				//        break;
+				//    }
+				//    if (text.Contains("-"))
+				//    {
+				//        string[] array = text.Split(new char[] { '-' });
+				//        if (IPAddress.TryParse(array[0], out ipaddress) && IPAddress.TryParse(array[1], out ipaddress2))
+				//        {
+				//            long num = (long)((ulong)HostTool.IpToLong(array[0]));
+				//            long num2 = (long)((ulong)HostTool.IpToLong(array[1]));
+				//            for (long num3 = num; num3 <= num2; num3 += 1L)
+				//            {
+				//                if (!PortScan.isRuning)
+				//                {
+				//                    break;
+				//                }
+				//                PortScan.AddHost(HostTool.LongToIP(num3));
+				//            }
+				//        }
+				//        else
+				//        {
+				//            PortScan.AddHost(text);
+				//        }
+				//    }
+				//    else
+				//    {
+				//        PortScan.AddHost(text);
+				//    }
+				//}
+
+				int nCount = 0;
+
+				foreach (Interval interval in lstIPInterval)
+				{
+					if (!PortScan.isRuning)
+					{
+						break;
+					}
+
+					if (interval.st != interval.ed)
+					{
+						for (long l = interval.st; l <= interval.ed; l++)
+						{
+							nCount++;
+						}
+					}
+					else
+					{
+						nCount++;
+					}
+				}
+				PortScan.MaxProgress = (long)PortScan.ScanPorts.Count * nCount;
+				foreach (Interval interval in lstIPInterval)
+					{
+						if (!PortScan.isRuning)
+					{
+						break;
+					}
+
+					if (interval.st != interval.ed)
+					{
+						for (long l = interval.st; l <= interval.ed; l++)
+						{
+							PortScan.AddHost(HostTool.LongToIP(l));
+						}
+					}
+					else
+					{
+						PortScan.AddHost(HostTool.LongToIP(interval.st));
+					}
+				}
+
+				lstIPInterval = null;
+			}
             catch
             {
             }
             PortScan.IPES.CompleteAdding();
-            File.Delete(PortScan.TaskTempFile);
+            //File.Delete(PortScan.TaskTempFile);
         }
 
         private static void AddHost(string IP)
@@ -523,40 +499,6 @@ namespace scanner.port
 
 		private static void CheckTimeout()
 		{
-			//for (; ; )
-			//{
-			//	if (!PortScan.isRuning)
-			//	{
-			//		goto IL_69;
-			//	}
-			//IL_07:
-			//	try
-			//	{
-			//		foreach (MyTask myTask in PortScan.MyTasks)
-			//		{
-			//			if (myTask.RunTime.IsRunning && myTask.RunTime.Elapsed.Seconds >= PortScan.TimeoutSec)
-			//			{
-			//				myTask.Sock.Close(0);
-			//			}
-			//		}
-			//		goto IL_72;
-			//	}
-			//	finally
-			//	{
-			//		//List<MyTask>.Enumerator enumerator;
-			//		//((IDisposable)enumerator).Dispose();
-			//	}
-			//	goto IL_69;
-			//IL_72:
-			//	Thread.Sleep(500);
-			//	continue;
-			//IL_69:
-			//	if (PortScan.NowThread != 0)
-			//	{
-			//		goto IL_07;
-			//	}
-			//	break;
-			//}
 			if (ShowVerbose)
 				Console.WriteLine("[{0}] Start CheckTimeout...", DateTime.Now.ToString("MM/dd HH:mm:ss"));
 			DateTime nStartTime = DateTime.Now;
@@ -766,65 +708,7 @@ namespace scanner.port
             Sender.Close(0);
 		}
 
-		private static uint IpToLong(string ip)
-		{
-			IPAddress ipaddress = null;
-			IPAddress.TryParse(ip, out ipaddress);
-			uint result;
-			if (ipaddress == null)
-			{
-				result = 0U;
-			}
-			else
-			{
-				byte[] addressBytes = ipaddress.GetAddressBytes();
-				Array.Reverse(addressBytes);
-				result = BitConverter.ToUInt32(addressBytes, 0);
-			}
-			return result;
-		}
 
-		private static string LongToIP(long longIP)
-		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append(longIP >> 24);
-			stringBuilder.Append(".");
-			stringBuilder.Append((longIP & 16777215L) >> 16);
-			stringBuilder.Append(".");
-			stringBuilder.Append((longIP & 65535L) >> 8);
-			stringBuilder.Append(".");
-			stringBuilder.Append(longIP & 255L);
-			return stringBuilder.ToString();
-		}
-
-		private static List<Interval> Merge(List<Interval> intervals)
-		{
-			List<Interval> list = new List<Interval>();
-			List<Interval> result;
-			if (intervals.Count == 0)
-			{
-				result = list;
-			}
-			else
-			{
-				intervals.OrderBy(i => i.st);
-				list.Add(intervals[0]);
-				long num = (long)(intervals.Count - 1);
-				for (long num2 = 1L; num2 <= num; num2 += 1L)
-				{
-					if (intervals[(int)num2].st <= list[list.Count - 1].ed)
-					{
-						list[list.Count - 1].ed = Math.Max(intervals[(int)num2].ed, list[list.Count - 1].ed);
-					}
-					else
-					{
-						list.Add(intervals[(int)num2]);
-					}
-				}
-				result = list;
-			}
-			return result;
-		}
 
 	}
 

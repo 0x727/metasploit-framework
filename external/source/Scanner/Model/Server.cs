@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 
 namespace SNETCracker.Model
 {
@@ -24,7 +24,7 @@ namespace SNETCracker.Model
         public Boolean isConnected = false;
         //public RdpClient client = null;
         public long userTime = 0;
-        public TabPage tp = null;
-        public TabControl tc = null;
+        //public TabPage tp = null;
+        //public TabControl tc = null;
     }
 }

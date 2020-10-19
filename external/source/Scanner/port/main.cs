@@ -23,7 +23,7 @@ namespace scanner.port
         [BoundedValueArgument(typeof(int), 'l', "ttl", MinValue = 1, MaxValue = 256, Description = "Set connect timeout seconds[1,256], default=64.")]
         public int nTTL;
 
-        [SwitchArgument('a', "alive", true, Description = "Set whether use ping to detect alive, default=true.")]
+        [SwitchArgument('a', "alive", false, Description = "Set whether use ping to detect alive, default=false.")]
         public bool bDetectAlive;
 
         [SwitchArgument('v', "verbose", false, Description = "Set whether show verbose log, default=false.")]
@@ -63,6 +63,7 @@ namespace scanner.port
                 PortScan.Host = p.strTarget;
                 PortScan.PortFile = p.strPort;
                 PortScan.DetectAlive = p.bDetectAlive;
+                //Console.WriteLine("-----------------Detect alive:{0}:{1}", PortScan.DetectAlive, p.bDetectAlive);
                 PortScan.ShowVerbose = p.bVerbose;
                 PortScan.MaxThread = 50;
                 PortScan.TimeoutSec = 5;
