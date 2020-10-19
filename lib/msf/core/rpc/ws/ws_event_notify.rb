@@ -68,6 +68,16 @@ module Msf
           framework.websocket.notify(:notify, data)
         end
 
+        def on_module_complete(mod)
+          res = {
+            'uuid'     => mod.uuid,
+            'fullname' => mod.fullname,
+            'session'  => mod.datastore['SESSION'],
+          }
+          data = framework.websocket.wrap_websocket_data(:notify, __method__, res)
+          framework.websocket.notify(:notify, data)
+        end
+
         def method_missing(_method_name, *_args)
         end
 

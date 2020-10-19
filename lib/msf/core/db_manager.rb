@@ -62,6 +62,7 @@ class Msf::DBManager
   autoload :WMAP, 'msf/core/db_manager/wmap'
   autoload :Web, 'msf/core/db_manager/web'
   autoload :Workspace, 'msf/core/db_manager/workspace'
+  autoload :ModuleResult, 'msf/core/db_manager/module_result'
 
   optionally_include_metasploit_credential_creation
 
@@ -101,6 +102,7 @@ class Msf::DBManager
   include Msf::DBManager::WMAP
   include Msf::DBManager::Web
   include Msf::DBManager::Workspace
+  include Msf::DBManager::ModuleResult
 
   # Provides :framework and other accessors
   include Msf::Framework::Offspring

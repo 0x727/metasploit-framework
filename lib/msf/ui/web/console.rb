@@ -31,7 +31,7 @@ class WebConsole
   module WebConsoleShell
 
     def supports_color?
-      false
+      true
     end
   end
 

@@ -7,6 +7,7 @@ gem 'sqlite3', '~>1.3.0'
 
 # akkuman-change
 gem 'yajl-ruby', require: 'yajl'
+gem 'faye-websocket'
 
 # separate from test as simplecov is not run on travis-ci
 group :coverage do
@@ -30,6 +31,7 @@ group :development do
   # Metasploit::Aggregator external session proxy
   # disabled during 2.5 transition until aggregator is available
   #gem 'metasploit-aggregator'
+  gem 'metasploit_data_models', git: 'https://github.com/akkuman/metasploit_data_models.git', branch: 'feature/add_module_result_table'
 end
 
 group :development, :test do
