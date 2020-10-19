@@ -78,7 +78,7 @@ class MetasploitModule < Msf::Post
             fail_with(Failure::BadConfig, "错误：没有找到.net运行程序#{ftp_exe_path}！")
         end
 
-        if datastore['THREADS'] != nil and datastore['THREADS'].positive? and datastore['THREADS'] < 10000
+        if datastore['THREADS'] != nil and datastore['THREADS'].positive? and datastore['THREADS'] <= 10000
             datastore['ARGUMENTS'] += ' -t ' + datastore['THREADS'].toString()
         end
 
@@ -88,7 +88,7 @@ class MetasploitModule < Msf::Post
             end
         end
 
-        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['CONNECT_TIMEOUT'] < 300
+        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['CONNECT_TIMEOUT'] <= 300
             datastore['ARGUMENTS'] += ' -o ' + datastore['CONNECT_TIMEOUT'].toString()
         end
 

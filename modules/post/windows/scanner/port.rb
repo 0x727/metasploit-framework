@@ -42,7 +42,7 @@ class MetasploitModule < Msf::Post
             [
                 OptInt.new('WAIT', [false, '进程运行后等待其执行的时间（单位：秒）', 10]),
                 OptInt.new('CONNECT_TIMEOUT', [false, '连接的超时时间（单位：秒），默认为5秒']),
-                OptInt.new('TTL', [false, 'PING的TTL次数', 64])
+                OptInt.new('TTL', [false, 'PING的TTL次数'])
                 OptBool.new('AMSIBYPASS', [true, 'Enable Amsi bypass', true]),
                 OptBool.new('ETWBYPASS', [true, 'Enable Etw bypass', true]),
                 OptString.new('USETHREADTOKEN', [false, '使用线程模拟生成进程', true]),
@@ -66,15 +66,15 @@ class MetasploitModule < Msf::Post
             fail_with(Failure::BadConfig, "错误：没有找到.net运行程序#{port_exe_path}！")
         end
 
-        if datastore['THREADS'] != nil and datastore['THREADS'].positive? and datastore['THREADS'] < 20000
+        if datastore['THREADS'] != nil and datastore['THREADS'].positive? and datastore['THREADS'] <= 20000
             datastore['ARGUMENTS'] += ' -t ' + datastore['THREADS'].toString()
         end
 
-        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['CONNECT_TIMEOUT'] < 300
+        if datastore['CONNECT_TIMEOUT'] != nil and datastore['CONNECT_TIMEOUT'].positive? and datastore['CONNECT_TIMEOUT'] <= 300
             datastore['ARGUMENTS'] += ' -o ' + datastore['CONNECT_TIMEOUT'].toString()
         end
 
-        if datastore['TTL'] != nil and datastore['TTL'].positive? and datastore['TTL'] < 256
+        if datastore['TTL'] != nil and datastore['TTL'].positive? and datastore['TTL'] <= 256
             datastore['ARGUMENTS'] += ' -l ' + datastore['TTL'].toString()
         end
 
