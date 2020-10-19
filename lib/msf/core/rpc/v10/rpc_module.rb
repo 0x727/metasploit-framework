@@ -498,12 +498,11 @@ class RPC_Module < RPC_Base
   def rpc_execute(mtype, mname, opts)
     mod = _find_module(mtype,mname)
 
+    # set pipe for module
     s = nil
-    if opts
-      sid = opts['SESSION'] || opts['session']
-      if sid
-        s = self.framework.sessions[sid.to_i]
-      end
+    sid = opts['SESSION']
+    if sid
+      s = self.framework.sessions[sid.to_i]
     end
     if mtype != 'payload'
       pipe = ModuleExecutePipe.new
@@ -519,6 +518,21 @@ class RPC_Module < RPC_Base
       )
 
       opts['LocalOutput'] = pipe
+    end
+
+    # set path from loot dir
+    mod.options.each_key do |k|
+      o = m.options[k]
+      if o.type == 'addressrange' or o.type == 'path'
+        opt = opts[k]
+        if opt
+          opt = opt.strip.delete_prefix('/').gsub(/..\//, '')
+          local_path = File.join(Msf::Config.loot_directory, path)
+          if File.file?(local_path)
+            opts[k] = local_path
+          end
+        end
+      end
     end
     
 

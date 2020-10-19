@@ -226,7 +226,7 @@ class RPC_Core < RPC_Base
   # @example Here's how you would use this from the client:
   # rpc.call('core.loot_upload', '1.txt', 'aGVsbG93b3JsZA==')
   def rpc_loot_upload(path, data)
-    path = path.strip.delete_prefix('/').delete_prefix('../')
+    path = path.strip.delete_prefix('/').gsub(/..\//, '')
     basedir = File.join(Msf::Config.loot_directory, File.dirname(path))
     FileUtils.mkdir_p(basedir)
     local_path = File.join(basedir, File.basename(path))
@@ -249,7 +249,7 @@ class RPC_Core < RPC_Base
   # @example Here's how you would use this from the client:
   # rpc.call('core.loot_download', '1.txt')
   def rpc_loot_download(path)
-    path = path.strip.delete_prefix('/').delete_prefix('../')
+    path = path.strip.delete_prefix('/').gsub(/..\//, '')
     local_path = File.join(Msf::Config.loot_directory, path)
     if File.file?(local_path)
       binary_data = File.read(local_path, mode: "rb")
