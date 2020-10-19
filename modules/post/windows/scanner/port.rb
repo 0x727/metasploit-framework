@@ -2,7 +2,7 @@
 
 class MetasploitModule < Msf::Post
 
-    include Msf::Post::File
+    # include Msf::Post::File
     # include Msf::Auxiliary::AuthBrute
   
     def initialize(info = {})
@@ -42,7 +42,7 @@ class MetasploitModule < Msf::Post
             [
                 OptInt.new('WAIT', [false, '进程运行后等待其执行的时间（单位：秒）', 10]),
                 OptInt.new('CONNECT_TIMEOUT', [false, '连接的超时时间（单位：秒），默认为5秒']),
-                OptInt.new('TTL', [false, 'PING的TTL次数'])
+                OptInt.new('TTL', [false, 'PING的TTL次数']),
                 OptBool.new('AMSIBYPASS', [true, 'Enable Amsi bypass', true]),
                 OptBool.new('ETWBYPASS', [true, 'Enable Etw bypass', true]),
                 OptString.new('USETHREADTOKEN', [false, '使用线程模拟生成进程', true]),
