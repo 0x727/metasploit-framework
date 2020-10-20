@@ -522,7 +522,7 @@ class RPC_Module < RPC_Base
 
     # set path from loot dir
     mod.options.each_key do |k|
-      o = m.options[k]
+      o = mod.options[k]
       if o.type == 'addressrange' or o.type == 'path'
         opt = opts[k]
         if opt
