@@ -25,6 +25,12 @@ class WebConsole
     end
   end
 
+  class WebConsoleDriver < Msf::Ui::Console::Driver
+    def unknown_command(method, line)
+      print_error("Unknown command: #{method}.")
+    end
+  end
+
   #
   # Provides some overrides for web-based consoles
   #
@@ -58,7 +64,7 @@ class WebConsole
     end
 
     # Initialize the console with our pipe
-    self.console = Msf::Ui::Console::Driver.new(
+    self.console = WebConsoleDriver.new(
       'msf',
       '>',
       opts.merge({
