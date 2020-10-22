@@ -90,14 +90,7 @@ class RPC_Job < RPC_Base
           info[:uripath] = obj.ctx[0].get_resource
         end
         if obj.ctx[0].respond_to?(:datastore)
-          datastore = {}
-          obj.ctx[0].datastore.each do |k, v|
-            # LocalOutput 会出现在 datastore 中，是一个 Pipe 对象，无法被 json 序列化
-            if k != 'LocalOutput'
-              datastore[k] = v
-            end
-          end
-          info[:datastore] = datastore
+          info[:datastore] = obj.ctx[0].datastore
         end
       end
       res << info

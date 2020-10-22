@@ -11,6 +11,10 @@ class RPC_Module < RPC_Base
     def prompting?
       false
     end
+
+    def to_json
+      return ''.to_json
+    end
   end
 
   # Returns a list of all module info
@@ -504,7 +508,7 @@ class RPC_Module < RPC_Base
     if sid
       s = self.framework.sessions[sid.to_i]
     end
-    if mtype != 'payload' and mod.fullname != 'exploit/multi/handler'
+    if mtype != 'payload'
       pipe = ModuleExecutePipe.new
       pipe.create_subscriber_proc(
         mod.uuid, &proc { |output|
