@@ -67,6 +67,43 @@ class RPC_Job < RPC_Base
 
     info
   end
+
+  # Returns a list of jobs with info.
+  #
+  # @return [Array] A Array contains hash that contains information about the job, such as the following (and maybe more):
+  #  * 'jid' [Integer] The Job ID.
+  #  * 'name' [String] The name of the job.
+  #  * 'start_time' [Integer] The start time.
+  #  * 'datastore' [Hash] Datastore options for the module.
+  #  rpc.call('job.list_info')
+  def rpc_list_info
+    res = []
+    self.framework.jobs.each do |j|
+      obj = j[1]
+      info = {
+        :jid => obj.jid,
+        :name => obj.name,
+        :start_time => obj.start_time.to_i
+      }
+      if obj.ctx && obj.ctx[0]
+        if obj.ctx[0].respond_to?(:get_resource)
+          info[:uripath] = obj.ctx[0].get_resource
+        end
+        if obj.ctx[0].respond_to?(:datastore)
+          datastore = {}
+          obj.ctx[0].datastore.each do |k, v|
+            # LocalOutput 会出现在 datastore 中，是一个 Pipe 对象，无法被 json 序列化
+            if k != 'LocalOutput'
+              datastore[k] = v
+            end
+          end
+          info[:datastore] = datastore
+        end
+      end
+      res << info
+    end
+    res
+  end
 end
 end
 end

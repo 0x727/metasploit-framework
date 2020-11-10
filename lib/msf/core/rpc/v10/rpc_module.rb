@@ -7,6 +7,12 @@ module Msf
 module RPC
 class RPC_Module < RPC_Base
 
+  class ModuleExecutePipe < Rex::Ui::Text::BidirectionalPipe
+    def prompting?
+      false
+    end
+  end
+
   # Returns a list of all module info
   #
   #  rpc.call('module.allinfo')
@@ -492,6 +498,44 @@ class RPC_Module < RPC_Base
   def rpc_execute(mtype, mname, opts)
     mod = _find_module(mtype,mname)
 
+    # set pipe for module
+    s = nil
+    sid = opts['SESSION']
+    if sid
+      s = self.framework.sessions[sid.to_i]
+    end
+    if mtype != 'payload' and mod.fullname != 'exploit/multi/handler'
+      pipe = ModuleExecutePipe.new
+      pipe.create_subscriber_proc(
+        mod.uuid, &proc { |output|
+          framework.db.report_module_result(opts={
+            :session    => s,
+            :track_uuid => mod.uuid,
+            :fullname   => mod.fullname,
+            :output     => output,
+          })
+        }
+      )
+
+      opts['LocalOutput'] = pipe
+    end
+
+    # set path from loot dir
+    mod.options.each_key do |k|
+      o = mod.options[k]
+      if o.type == 'addressrange' or o.type == 'path'
+        opt = opts[k]
+        if opt
+          opt = opt.strip.delete_prefix('/').gsub(/..\//, '')
+          local_path = File.join(Msf::Config.loot_directory, path)
+          if File.file?(local_path)
+            opts[k] = local_path
+          end
+        end
+      end
+    end
+    
+
     case mtype
       when 'exploit'
         _run_exploit(mod, opts)
@@ -753,7 +797,8 @@ private
     uuid, job = Msf::Simple::Auxiliary.run_simple(mod,{
       'Action'   => opts['ACTION'],
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput']
     }, job_listener: self.job_status_tracker)
     {
       "job_id" => job,
@@ -787,7 +832,8 @@ private
   def _run_post(mod, opts)
     Msf::Simple::Post.run_simple(mod, {
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput']
     })
     {
       "job_id" => mod.job_id,
@@ -800,7 +846,8 @@ private
       'Payload'  => opts['PAYLOAD'],
       'Target'   => opts['TARGET'],
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput']
     })
 
     {

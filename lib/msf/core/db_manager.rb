@@ -62,6 +62,7 @@ class Msf::DBManager
   autoload :WMAP, 'msf/core/db_manager/wmap'
   autoload :Web, 'msf/core/db_manager/web'
   autoload :Workspace, 'msf/core/db_manager/workspace'
+  autoload :ModuleResult, 'msf/core/db_manager/module_result'
 
   optionally_include_metasploit_credential_creation
 
@@ -101,6 +102,7 @@ class Msf::DBManager
   include Msf::DBManager::WMAP
   include Msf::DBManager::Web
   include Msf::DBManager::Workspace
+  include Msf::DBManager::ModuleResult
 
   # Provides :framework and other accessors
   include Msf::Framework::Offspring
@@ -192,28 +194,28 @@ class Msf::DBManager
       end
     end
 
-    if connection_established?
-      after_establish_connection
+    configuration_pathname = Metasploit::Framework::Database.configurations_pathname(path: opts['DatabaseYAML'])
+
+    if configuration_pathname.nil?
+      self.error = "No database YAML file"
     else
-      configuration_pathname = Metasploit::Framework::Database.configurations_pathname(path: opts['DatabaseYAML'])
-
-      if configuration_pathname.nil?
-        self.error = "No database YAML file"
+      if configuration_pathname.readable?
+        # parse specified database YAML file
+        dbinfo = YAML.load_file(configuration_pathname) || {}
+        dbenv  = opts['DatabaseEnv'] || Rails.env
+        db     = dbinfo[dbenv]
       else
-        if configuration_pathname.readable?
-          # parse specified database YAML file
-          dbinfo = YAML.load_file(configuration_pathname) || {}
-          dbenv  = opts['DatabaseEnv'] || Rails.env
-          db     = dbinfo[dbenv]
-        else
-          elog("Warning, #{configuration_pathname} is not readable. Try running as root or chmod.")
-        end
+        elog("Warning, #{configuration_pathname} is not readable. Try running as root or chmod.")
+      end
+    end
 
-        if not db
-          elog("No database definition for environment #{dbenv}")
-        else
-          init_success = connect(db)
-        end
+    if connection_established?
+      after_establish_connection(db)
+    else
+      if not db
+        elog("No database definition for environment #{dbenv}")
+      else
+        init_success = connect(db)
       end
     end
 

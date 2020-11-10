@@ -745,6 +745,8 @@ module Msf
             end
 
             mod.init_ui(driver.input, driver.output)
+            # trigger driver console subscriber handler
+            print
           end
 
           #
@@ -1278,7 +1280,7 @@ module Msf
                       count += 1,
                       refname,
                       o.disclosure_date.nil? ? "" : o.disclosure_date.strftime("%Y-%m-%d"),
-                      o.rank_to_s,
+                      o.rank,
                       o.has_check? ? 'Yes' : 'No',
                       o.name
                     ]
