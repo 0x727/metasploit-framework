@@ -27,5 +27,8 @@ namespace Tools
 
         [BoundedValueArgument(typeof(int), 'o', "timeout", MinValue = 1, MaxValue = 300, Description = "Set connect timeout seconds[1,300], default=5.")]
         public int nTimeOut;
+
+        [SwitchArgument('v', "verbose", false, Description = "Set whether show verbose log, default=false.")]
+        public bool bVerbose;
     }
 }

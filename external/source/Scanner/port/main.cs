@@ -20,7 +20,7 @@ namespace scanner.port
         [BoundedValueArgument(typeof(int), 'o', "timeout", MinValue = 1, MaxValue = 300, Description = "Set connect timeout seconds[1,300], default=5.")]
         public int nTimeOut;
 
-        [BoundedValueArgument(typeof(int), 'l', "ttl", MinValue = 1, MaxValue = 256, Description = "Set connect timeout seconds[1,256], default=64.")]
+        [BoundedValueArgument(typeof(int), 'l', "ttl", MinValue = 1, MaxValue = 256, Description = "Set ping ttl[1,256], default=64.")]
         public int nTTL;
 
         [SwitchArgument('a', "alive", false, Description = "Set whether use ping to detect alive, default=false.")]

@@ -44,6 +44,7 @@ namespace scanner.mysql
                 if (p.nTimeOut > 0 && p.nTimeOut <= 300) objMain.timeOut = p.nTimeOut;
                 if (p.nThread > 0 && p.nThread <= 10000) objMain.maxThread = p.nThread;
                 if (p.nPort <= 0 || p.nPort > 65535) p.nPort = nServicePort;
+                if (p.bVerbose) objMain.logLevel = 3;
 
                 if (!objMain.cracker(strServiceName, p.strTarget, p.nPort, p.strUsernameOrFilePath, p.strPasswordOrFilePath))
                 {

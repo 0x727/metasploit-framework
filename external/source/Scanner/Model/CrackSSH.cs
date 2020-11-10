@@ -21,8 +21,8 @@ namespace SNETCracker.Model
                 try
                 {
                     client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(timeOut);
-                    server.isSuccess = true;
                     client.Connect();
+                    server.isSuccess = true;
                 }
                 catch (Exception e)
                 {
