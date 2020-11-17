@@ -530,8 +530,7 @@ class RPC_Module < RPC_Base
       if o.type == 'addressrange' or o.type == 'path'
         opt = opts[k]
         if opt
-          opt = opt.strip.delete_prefix('/').gsub(/..\//, '')
-          local_path = File.join(Msf::Config.loot_directory, path)
+          local_path = opt.strip.delete_prefix('/').gsub(/\.\.\//, '').gsub(/\$lootdir\$/, Msf::Config.loot_directory)
           if File.file?(local_path)
             opts[k] = local_path
           end
