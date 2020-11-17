@@ -414,10 +414,10 @@ class RPC_Session < RPC_Base
   def rpc_meterpreter_screenshot(sid, quality=50)
     s = _valid_session(sid,"meterpreter")
 
-    screenshot_path =  "screenshots/#{s.session_host}_#{Time.now.strftime('%Y%m%d%H%M%S')}.jpeg"
+    screenshot_path =  "screenshots/#{s.session_host}/#{Time.now.strftime('%Y%m%d%H%M%S')}.jpeg"
     basedir = File.join(Msf::Config.loot_directory, File.dirname(screenshot_path))
     FileUtils.mkdir_p(basedir)
-    data     = s.console.client.ui.screenshot(quality)
+    data    = s.console.client.ui.screenshot(quality)
 
     if data
       path = File.join(basedir, File.basename(screenshot_path))
