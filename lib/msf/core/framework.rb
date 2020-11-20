@@ -485,24 +485,13 @@ class FrameworkEventSubscriber
   ##
   # :category: ::Msf::SessionEvent implementors
   def on_session_output(session, output)
-    # Break up the output into chunks that will fit into the database.
     buff = output.dup
-    chunks = []
-    if buff.length > 1024
-      while buff.length > 0
-        chunks << buff.slice!(0,1024)
-      end
-    else
-      chunks << buff
-    end
-    chunks.each { |chunk|
-      session_event('session_output', session, :output => chunk)
-      framework.db.report_session_event({
-        :etype => 'output',
-        :session => session,
-        :output => chunk
-      })
-    }
+    session_event('session_output', session, :output => buff)
+    framework.db.report_session_event({
+      :etype => 'output',
+      :session => session,
+      :output => buff
+    })
   end
 
   ##
