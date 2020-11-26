@@ -78,6 +78,7 @@ class RPC_Job < RPC_Base
   #  rpc.call('job.list_info')
   def rpc_list_info
     res = []
+
     self.framework.jobs.each do |j|
       obj = j[1]
       info = {
@@ -91,6 +92,9 @@ class RPC_Job < RPC_Base
         end
         if obj.ctx[0].respond_to?(:datastore)
           info[:datastore] = obj.ctx[0].datastore
+        end
+        if obj.ctx[0].respond_to?(:uuid)
+          info[:uuid] = obj.ctx[0].uuid
         end
       end
       res << info
