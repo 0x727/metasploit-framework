@@ -277,6 +277,22 @@ class RPC_Core < RPC_Base
     {:result => true}
   end
 
+  # list all rc script with content
+  # @example Here's how you would use this from the client:
+  # rpc.call('core.rc_list')
+  def rpc_rc_list()
+    scripts = []
+    path = File.join(::Msf::Config.script_directory, 'resource')
+    rc_files = Dir.glob("#{path}/*.rc").each do |rc_path|
+      rc_name = rc_path.gsub(path + ::File::SEPARATOR, '')
+      if ::File.file?(rc_path) && File.readable?(rc_path)
+        rc_content = ::File.read(rc_path)
+        scripts << {:rc_name => rc_name, :rc_content => rc_content}
+      end
+    end
+    {:result => false, :data => scripts}
+  end
+
 end
 end
 end
