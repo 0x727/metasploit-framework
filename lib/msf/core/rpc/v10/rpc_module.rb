@@ -788,7 +788,8 @@ private
       'Payload'  => opts['PAYLOAD'],
       'Target'   => opts['TARGET'],
       'RunAsJob' => true,
-      'Options'  => opts
+      'Options'  => opts,
+      'LocalOutput' => opts['LocalOutput'],
     })
     {
       "job_id" => mod.job_id,
@@ -836,7 +837,7 @@ private
     Msf::Simple::Post.run_simple(mod, {
       'RunAsJob' => true,
       'Options'  => opts,
-      'LocalOutput' => opts['LocalOutput']
+      'LocalOutput' => opts['LocalOutput'],
     })
     {
       "job_id" => mod.job_id,
