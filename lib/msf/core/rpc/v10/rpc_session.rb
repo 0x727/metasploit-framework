@@ -2,6 +2,7 @@
 require 'rex'
 require 'rex/ui/text/output/buffer'
 require 'fileutils'
+require 'pry' # deal with Error 'uninitialized constant Readline'
 
 module Msf
 module RPC
@@ -280,7 +281,7 @@ class RPC_Session < RPC_Base
     { "result" => "success" }
   end
 
-  def rpc_meterpreter_cmdexec(sid, cmd, args=nil, time_out=15)
+  def rpc_meterpreter_cmdexec(sid, cmd, args=nil, time_out=30)
     s = _valid_session(sid, nil)
     framework.events.on_session_command(s, "#{cmd} #{args}")
     self.framework.threads.spawn("MeterpreterCmdExec", false, s, cmd, args, time_out) { |sess, cmd, args, time_out|
@@ -334,6 +335,41 @@ class RPC_Session < RPC_Base
       end
     }
     { "result" => "success" }
+  end
+
+
+  # download file from the target host
+  # @example Here's how you would use this from the client:
+  #  rpc.call('session.meterpreter_download_file', 2, "c:\\Users\\Test\\.gitconfig")
+  def rpc_meterpreter_download_file(sid, src, dest=nil)
+    sess = _valid_session(sid, "meterpreter")
+
+    src = src.gsub(/\\/, '/')
+    if not dest
+      filepath = "temp/#{File.basename(src)}"
+      dest = File.join(Msf::Config.loot_directory, filepath)
+      if File.exist?(dest)
+        filepath = "temp/#{Time.now.strftime('%Y%m%d%H%M%S')}_#{File.basename(src)}"
+        dest = File.join(Msf::Config.loot_directory, filepath)
+      end
+      FileUtils.mkdir_p(File.dirname(dest))
+    end
+
+    opts = {
+      "recursive" => true,
+    }
+    stat = sess.fs.file.stat(src)
+    if (stat.directory?)
+      sess.fs.dir.download(dest, src, opts) do |step, src, dst|
+        framework.events.on_session_download(sess, src, dest)
+      end
+    elsif (stat.file?)
+      sess.fs.file.download(dest, src, opts) do |step, src, dst|
+        framework.events.on_session_download(sess, src, dest)
+      end
+    end
+
+    {"result" => "success", "data" => filepath}
   end
 
 
@@ -456,59 +492,41 @@ class RPC_Session < RPC_Base
     { "result" => "success", "data" => b64 }
   end
 
-  #  rpc.call('session.meterpreter_route', 3)
-  def rpc_meterpreter_route(sid)
-    s = _valid_session(sid,"meterpreter")
-
-    routes = s.console.client.net.config.routes
-
-    # IPv4
-    tbl = Rex::Text::Table.new(
-      'Header'  => 'IPv4 network routes',
-      'Indent'  => 4,
-      'Columns' => [
-        'Subnet',
-        'Netmask',
-        'Gateway',
-        'Metric',
-        'Interface'
-      ])
-
-    routes.select {|route|
-      Rex::Socket.is_ipv4?(route.netmask)
-    }.each { |route|
-      tbl << [ route.subnet, route.netmask, route.gateway, route.metric, route.interface ]
+  # rpc.call('session.meterpreter_route_list')
+  def rpc_meterpreter_route_list
+    list_route = []
+    Rex::Socket::SwitchBoard.each { |route|
+      if route.comm.kind_of?(Msf::Session)
+        gw = route.comm.sid
+      else
+        gw = route.comm.name.split(/::/)[-1]
+      end
+      list_route << {
+        :subnet => route.subnet,
+        :netmask => route.netmask,
+        :session => gw
+      } if Rex::Socket.is_ipv4?(route.netmask)
     }
+    list_route
+  end
 
-    if tbl.rows.length > 0
-      return { "result" => "success", "data" => tbl.to_s }
+  # rpc.call('session.meterpreter_route_add', sid, subnet, netmask)
+  def rpc_meterpreter_route_add(sid, subnet, netmask)
+    s = _valid_session(sid, "meterpreter")
+
+    if Rex::Socket::SwitchBoard.add_route(subnet, netmask, s)
+      return { "result" => "success", "data" => "Route added to subnet #{subnet}/#{netmask}." }
     else
-      return { "result" => "failure" }
+      return { "result" => "failure", "data" => "Could not add route to subnet #{subnet}/#{netmask}." }
     end
+  end
 
-    # IPv6
-    tbl = Rex::Text::Table.new(
-      'Header'  => 'IPv6 network routes',
-      'Indent'  => 4,
-      'Columns' => [
-        'Subnet',
-        'Netmask',
-        'Gateway',
-        'Metric',
-        'Interface'
-      ])
+  #  rpc.call('session.meterpreter_route_del', sid, subnet, netmask)
+  def rpc_meterpreter_route_del(sid, subnet, netmask)
+    s = _valid_session(sid, "meterpreter")
 
-    routes.select {|route|
-      Rex::Socket.is_ipv6?(route.netmask)
-    }.each { |route|
-      tbl << [ route.subnet, route.netmask, route.gateway, route.metric, route.interface ]
-    }
-
-    if tbl.rows.length > 0
-      return { "result" => "success", "data" => tbl.to_s }
-    else
-      return { "result" => "failure" }
-    end
+    Rex::Socket::SwitchBoard.remove_route(subnet, netmask, s)
+    return { "result" => "success" }
   end
 
   # Detaches from a meterpreter session. Serves the same purpose as [CTRL]+[Z].
@@ -571,7 +589,8 @@ class RPC_Session < RPC_Base
   #  rpc.call('session.meterpreter_tabs', 3, 'sysin')
   def rpc_meterpreter_tabs(sid, line)
     s = _valid_session(sid,"meterpreter")
-    { "tabs" => s.console.tab_complete(line) }
+    tabs = s.console.tab_complete(line)
+    { "tabs" => tabs }
   end
 
 
