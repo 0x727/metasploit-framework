@@ -209,7 +209,7 @@ namespace Tools
                     }
                     else
                     {
-                        //LogWarning(ip + "-----" + serviceName + "----" + username + "----" + password + "失败！");
+                        LogWarning(ip + "-----" + serviceName + "----" + username + "----" + password + "失败！");
                     }
 
                 }

@@ -108,8 +108,9 @@ namespace Tools
 			IPAddress ipaddress = null;
 			try
 			{
-				foreach (string text in File.ReadLines(TaskTempFile))
+				foreach (string textItem in File.ReadLines(TaskTempFile))
 				{
+					string text = textItem.Trim();
 					if (text.Length != 0)
 					{
 						if (text.Contains("-"))

