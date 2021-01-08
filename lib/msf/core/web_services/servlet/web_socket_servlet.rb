@@ -1,5 +1,11 @@
 require 'msf/core/rpc'
 require 'faye/websocket'
+require 'rex/text/color'
+include Rex::Text::Color
+
+def supports_color?
+  true
+end
 
 module Msf::WebServices
   module WebsocketServlet
@@ -63,13 +69,15 @@ module Msf::WebServices
           ws = Faye::WebSocket.new(env, nil, { ping: 15 })
           ws.on :open do |_event|
             framework.websocket.register(:console, ws)
-            @console_driver = Msf::Ui::Web::DriverFactory.instance.get_or_create(opts={:framework => framework})
-            @cid = @console_driver.create_console({})
+            opts = {:framework => framework, :DisableBanner=>true}
+            @console_driver = Msf::Ui::Web::DriverFactory.instance.get_or_create(opts=opts)
+            @cid = @console_driver.create_console(opts)
             # send welcome message
             prompt = @console_driver.consoles[@cid].console.update_prompt
+            content_color = @console_driver.consoles[@cid].read
             start_msg = {
               'cid'    => @cid,
-              'data'   => Rex::Text.encode_base64(@console_driver.consoles[@cid].read)   || '',
+              'data'   => Rex::Text.encode_base64(content_color)   || '',
               'prompt' => @console_driver.consoles[@cid].prompt || '',
             }
             ws.send(start_msg.to_json)
@@ -81,10 +89,11 @@ module Msf::WebServices
                 if (@console_driver.consoles[@cid].console.active_session)
                   prompt = @console_driver.consoles[@cid].console.update_prompt('%undmeterpreter%clr')
                 end
+                content_color = substitute_colors(output)
                 data = {
                   'cid'    => @cid,
                   'prompt' => prompt || '',
-                  'data'   => Rex::Text.encode_base64(output) || ''
+                  'data'   => Rex::Text.encode_base64(content_color) || ''
                 }
                 ws.send(data.to_json)
               }
