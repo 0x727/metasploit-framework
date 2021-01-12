@@ -1,4 +1,5 @@
 # -*- coding: binary -*-
+require 'yajl'
 require 'msf/core/rpc/ws/ws_event_notify'
 
 module Msf
@@ -27,7 +28,8 @@ module Msf
 
     def wrap_websocket_data(type, action, data)
       res = { type: type, action: action, data: data }
-      res.to_json
+      json = Yajl::Encoder.encode(res)
+      json.to_s
     end
 
     def notify(type, message)

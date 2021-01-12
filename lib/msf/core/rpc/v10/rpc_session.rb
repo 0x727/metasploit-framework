@@ -1,12 +1,18 @@
 # -*- coding: binary -*-
 require 'rex'
+require 'rex/post/meterpreter/inbound_packet_handler'
 require 'rex/ui/text/output/buffer'
 require 'fileutils'
 require 'pry' # deal with Error 'uninitialized constant Readline'
 
 module Msf
 module RPC
+
 class RPC_Session < RPC_Base
+  def initialize(*args)
+    super
+    _notify_session_heartbeat(10)
+  end
 
   # Returns a list of sessions that belong to the framework instance used by the RPC service.
   #
@@ -29,6 +35,7 @@ class RPC_Session < RPC_Base
   #                * 'platform' [String] Platform.
   # @example Here's how you would use this from the client:
   #  rpc.call('session.list')
+
   def rpc_list
     res = {}
     self.framework.sessions.each do |sess|
@@ -49,7 +56,8 @@ class RPC_Session < RPC_Base
         'uuid'         => s.uuid.to_s,
         'exploit_uuid' => s.exploit_uuid.to_s,
         'routes'       => s.routes.join(","),
-        'arch'         => s.arch.to_s
+        'arch'         => s.arch.to_s,
+        'checkin'      => Time.now.to_i - s.last_checkin.to_i,
       }
       if(s.type.to_s == "meterpreter")
         res[s.sid]['platform'] = s.platform.to_s
@@ -348,26 +356,36 @@ class RPC_Session < RPC_Base
     if not dest
       filepath = "temp/#{File.basename(src)}"
       dest = File.join(Msf::Config.loot_directory, filepath)
-      if File.exist?(dest)
-        filepath = "temp/#{Time.now.strftime('%Y%m%d%H%M%S')}_#{File.basename(src)}"
-        dest = File.join(Msf::Config.loot_directory, filepath)
-      end
       FileUtils.mkdir_p(File.dirname(dest))
     end
 
     opts = {
       "recursive" => true,
     }
-    stat = sess.fs.file.stat(src)
-    if (stat.directory?)
-      sess.fs.dir.download(dest, src, opts) do |step, src, dst|
-        framework.events.on_session_download(sess, src, dest)
+    self.framework.threads.spawn("MeterpreterDownloadFile", false) {
+      data = { 'sid': sid, 'filepath': filepath }
+
+      begin
+        stat = sess.fs.file.stat(src)
+        if (stat.directory?)
+          sess.fs.dir.download(dest, src, opts) do |step, src, dst|
+            framework.events.on_session_download(sess, src, dest)
+          end
+        elsif (stat.file?)
+          sess.fs.file.download(dest, src, opts) do |step, src, dst|
+            framework.events.on_session_download(sess, src, dest)
+          end
+        end
+        data['success'] = true
+      rescue ::Exception => e
+        data['success'] = false
+        data['msg'] = "#{e.class} #{e}"
       end
-    elsif (stat.file?)
-      sess.fs.file.download(dest, src, opts) do |step, src, dst|
-        framework.events.on_session_download(sess, src, dest)
-      end
-    end
+
+      data = { 'sid': sid, 'filepath': filepath }
+      msg = self.framework.websocket.wrap_websocket_data(:notify, 'on_finished_download', data)
+      self.framework.websocket.notify(:notify, msg)
+    }
 
     {"result" => "success", "data" => filepath}
   end
@@ -453,18 +471,30 @@ class RPC_Session < RPC_Base
     screenshot_path =  "screenshots/#{s.session_host}/#{Time.now.strftime('%Y%m%d%H%M%S')}.jpeg"
     basedir = File.join(Msf::Config.loot_directory, File.dirname(screenshot_path))
     FileUtils.mkdir_p(basedir)
-    data    = s.console.client.ui.screenshot(quality)
+    uuid = Rex::Text.rand_text_alphanumeric(16).downcase
 
-    if data
-      path = File.join(basedir, File.basename(screenshot_path))
-      ::File.open(path, 'wb') do |fd|
-        fd.write(data)
+    self.framework.threads.spawn("MeterpreterScreenshot", false) {
+      _data = { 'sid': sid, "path" => screenshot_path, "uuid" => uuid }
+
+      begin
+        data = s.console.client.ui.screenshot(quality)
+        path = File.join(basedir, File.basename(screenshot_path))
+        ::File.open(path, 'wb') do |fd|
+          fd.write(data)
+        end
+        b64 = Base64.strict_encode64(data)
+        _data['success'] = true
+        _data['data'] = b64
+      rescue ::Exception => e
+        _data['success'] = false
+        _data['msg'] = "#{e.class} #{e}"
       end
-      b64 = Base64.strict_encode64(data)
-      { "result" => "success", "data" => b64, "path" => screenshot_path }
-    else
-      { "result" => "failure" }
-    end
+
+      msg = self.framework.websocket.wrap_websocket_data(:notify, 'on_finished_screenshot', _data)
+      self.framework.websocket.notify(:notify, msg)
+    }
+
+    {"result" => "success", "data" => screenshot_path, "uuid" => uuid}
   end
 
   #  rpc.call('session.meterpreter_keyscan_start', 3)
@@ -893,6 +923,28 @@ private
       error(500, "Session is not of type " + type)
     end
     s
+  end
+
+  def _notify_session_heartbeat(period=1)
+    self.framework.threads.spawn("WSNotifySessionHeartbeat", true) {
+      while true
+        begin
+          data = {}
+          self.framework.sessions.each do |sess|
+            i,s = sess
+            data[s.sid] = { 'sid': s.sid, 'checkin': Time.now.to_i - s.last_checkin.to_i }
+          end
+          if data
+            msg = self.framework.websocket.wrap_websocket_data(:notify, 'on_session_heartbeat', data)
+            self.framework.websocket.notify(:notify, msg)
+          end
+        rescue ::Exception => e
+          dlog(e)
+        ensure
+          sleep(period)
+        end
+      end
+    }
   end
 
 end
